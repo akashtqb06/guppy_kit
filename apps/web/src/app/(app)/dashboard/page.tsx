@@ -1,23 +1,15 @@
+import Link from "next/link";
 import type { Metadata } from "next";
+import { getCategories, getTools } from "@/lib/api";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
-const RECENT_TOOLS = [
-  { name: "JSON Formatter", family: "developer", icon: "⚡" },
-  { name: "CSV → JSON", family: "data", icon: "📊" },
-  { name: "Hash Generator", family: "utilities", icon: "🔧" },
-];
+export default async function DashboardPage() {
+  const categories = await getCategories();
+  const tools = await getTools();
 
-const FAMILY_CARDS = [
-  { id: "data", name: "Data", icon: "📊", desc: "Convert, profile, and transform" },
-  { id: "developer", name: "Developer", icon: "⚡", desc: "Format, decode, validate" },
-  { id: "database", name: "Database", icon: "🗄️", desc: "SQL, schemas, ER diagrams" },
-  { id: "visualization", name: "Visualization", icon: "📈", desc: "Charts and diagrams" },
-];
+  const recentTools = tools.slice(0, 3); // Proxy for recent/popular for now
 
-import Link from "next/link";
-
-export default function DashboardPage() {
   return (
     <div className="px-8 py-8 max-w-5xl mx-auto space-y-10">
       {/* Header */}
@@ -34,16 +26,16 @@ export default function DashboardPage() {
           Quick Start
         </h2>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          {RECENT_TOOLS.map((tool) => (
+          {recentTools.map((tool) => (
             <Link
               key={tool.name}
-              href={`/tools/${tool.family}/${tool.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
+              href={`/tools/${tool.category}/${tool.name}`}
               className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 transition-all hover:border-foreground/20 hover:shadow-sm"
             >
-              <span className="text-xl">{tool.icon}</span>
+              <span className="text-xl">🛠️</span>
               <div>
-                <p className="text-sm font-medium">{tool.name}</p>
-                <p className="text-xs text-muted-foreground capitalize">{tool.family}</p>
+                <p className="text-sm font-medium capitalize">{tool.name.replace(/-/g, ' ')}</p>
+                <p className="text-xs text-muted-foreground capitalize">{tool.category}</p>
               </div>
             </Link>
           ))}
@@ -56,7 +48,7 @@ export default function DashboardPage() {
           Explore Tool Families
         </h2>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {FAMILY_CARDS.map((family) => (
+          {categories.map((family) => (
             <Link
               key={family.id}
               href={`/tools/${family.id}`}
@@ -64,7 +56,7 @@ export default function DashboardPage() {
             >
               <span className="text-2xl">{family.icon}</span>
               <p className="mt-3 font-semibold text-sm">{family.name}</p>
-              <p className="text-xs text-muted-foreground mt-1">{family.desc}</p>
+              <p className="text-xs text-muted-foreground mt-1">{family.description}</p>
             </Link>
           ))}
         </div>

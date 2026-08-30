@@ -4,20 +4,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
+import type { CategorySummary } from "@/lib/api";
 
-const NAV_ITEMS = [
-  { href: "/dashboard", label: "Dashboard", icon: "⊞" },
-  { href: "/tools/data", label: "Data", icon: "📊" },
-  { href: "/tools/documents", label: "Documents", icon: "📄" },
-  { href: "/tools/developer", label: "Developer", icon: "⚡" },
-  { href: "/tools/database", label: "Database", icon: "🗄️" },
-  { href: "/tools/visualization", label: "Visualization", icon: "📈" },
-  { href: "/tools/presentation", label: "Presentation", icon: "🎯" },
-  { href: "/tools/workflow", label: "Workflow", icon: "🔁" },
-  { href: "/tools/utilities", label: "Utilities", icon: "🔧" },
-];
-
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({
+  children,
+  categories,
+}: {
+  children: React.ReactNode;
+  categories: CategorySummary[];
+}) {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const router = useRouter();
@@ -26,6 +21,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     await logout();
     router.push("/");
   }
+
+  const navItems = [
+    { href: "/dashboard", label: "Dashboard", icon: "⊞" },
+    ...categories.map((c) => ({
+      href: `/tools/${c.id}`,
+      label: c.name,
+      icon: c.icon,
+    })),
+  ];
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
@@ -52,7 +56,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto py-3 px-2">
           <ul className="space-y-0.5" role="list">
-            {NAV_ITEMS.map((item) => {
+            {navItems.map((item) => {
               const isActive =
                 pathname === item.href ||
                 (item.href !== "/dashboard" && pathname.startsWith(item.href));

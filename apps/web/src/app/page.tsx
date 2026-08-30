@@ -1,87 +1,19 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { getCategories, getTools } from "@/lib/api";
 
 export const metadata: Metadata = {
   title: "Guppy Kit — Professional Digital Workbench",
 };
 
-const TOOL_FAMILIES = [
-  {
-    id: "data",
-    name: "Data",
-    description: "Convert, profile, clean, and transform tabular data.",
-    icon: "📊",
-    color: "oklch(0.55 0.22 240)",
-    tools: ["CSV → JSON", "Excel → JSON", "JSON formatter", "Data profiler"],
-  },
-  {
-    id: "documents",
-    name: "Documents",
-    description: "Convert, merge, split, and compare files.",
-    icon: "📄",
-    color: "oklch(0.55 0.2 160)",
-    tools: ["PDF → Text", "Markdown → PDF", "PDF merger", "DOCX → PDF"],
-  },
-  {
-    id: "developer",
-    name: "Developer",
-    description: "Format, encode, decode, validate, and generate.",
-    icon: "⚡",
-    color: "oklch(0.55 0.25 60)",
-    tools: ["JSON formatter", "JWT decoder", "Base64", "Regex tester"],
-  },
-  {
-    id: "database",
-    name: "Database",
-    description: "Design schemas, generate SQL, and visualize relationships.",
-    icon: "🗄️",
-    color: "oklch(0.55 0.22 30)",
-    tools: ["SQL formatter", "Schema designer", "ER diagram", "SQL validator"],
-  },
-  {
-    id: "visualization",
-    name: "Visualization",
-    description: "Charts, diagrams, flowcharts, and architecture maps.",
-    icon: "📈",
-    color: "oklch(0.55 0.24 300)",
-    tools: ["Bar chart", "Line chart", "Flowchart", "Architecture diagram"],
-  },
-  {
-    id: "presentation",
-    name: "Presentation",
-    description: "Create, edit, and export slide decks.",
-    icon: "🎯",
-    color: "oklch(0.55 0.22 350)",
-    tools: ["Slide builder", "Chart → Slide", "Export PPTX", "Export PDF"],
-  },
-  {
-    id: "workflow",
-    name: "Workflow",
-    description: "Chain tools together in visual data pipelines.",
-    icon: "🔁",
-    color: "oklch(0.55 0.2 190)",
-    tools: ["Pipeline builder", "Scheduled runs", "Step branching", "Error handling"],
-  },
-  {
-    id: "utilities",
-    name: "Utilities",
-    description: "Hash, encode, convert, diff, and miscellaneous helpers.",
-    icon: "🔧",
-    color: "oklch(0.55 0.18 90)",
-    tools: ["Hash generator", "URL encoder", "Timestamp converter", "Color picker"],
-  },
-];
+export default async function LandingPage() {
+  const categories = await getCategories();
+  const allTools = await getTools();
 
-const POPULAR_TOOLS = [
-  { name: "JSON Formatter", family: "developer", description: "Beautify and validate JSON" },
-  { name: "CSV → JSON", family: "data", description: "Convert spreadsheet data to JSON" },
-  { name: "URL Encoder", family: "developer", description: "Encode or decode URLs" },
-  { name: "Hash Generator", family: "utilities", description: "MD5, SHA-1, SHA-256, SHA-512" },
-  { name: "JWT Decoder", family: "developer", description: "Inspect and decode JWT tokens" },
-  { name: "Base64", family: "developer", description: "Encode and decode Base64 strings" },
-];
+  // For the landing page, we want a few popular tools to highlight
+  // Here we just pick the first 6 tools as a proxy for "popular"
+  const popularTools = allTools.slice(0, 6);
 
-export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* ── Navigation ── */}
@@ -164,12 +96,12 @@ export default function LandingPage() {
 
           <div className="flex flex-wrap justify-center gap-2 text-xs text-muted-foreground">
             <span>Popular:</span>
-            {["JSON formatter", "CSV → JSON", "JWT decoder", "SQL formatter", "Base64"].map((t) => (
+            {popularTools.map((t) => (
               <button
-                key={t}
-                className="rounded-full border border-border px-2.5 py-0.5 transition-colors hover:border-foreground/30 hover:text-foreground"
+                key={t.name}
+                className="rounded-full border border-border px-2.5 py-0.5 transition-colors hover:border-foreground/30 hover:text-foreground capitalize"
               >
-                {t}
+                {t.name.replace(/-/g, ' ')}
               </button>
             ))}
           </div>
@@ -180,44 +112,47 @@ export default function LandingPage() {
       <section className="px-6 py-16">
         <div className="mx-auto max-w-7xl">
           <div className="mb-10 text-center">
-            <h2 className="text-3xl font-bold tracking-tight">8 Tool Families</h2>
+            <h2 className="text-3xl font-bold tracking-tight">{categories.length} Tool Families</h2>
             <p className="mt-2 text-muted-foreground">
               Everything a data analyst, developer, or operations team needs — in one place.
             </p>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {TOOL_FAMILIES.map((family) => (
-              <Link
-                key={family.id}
-                href={`/tools/${family.id}`}
-                id={`family-card-${family.id}`}
-                className="group rounded-2xl border border-border bg-card p-6 transition-all duration-200 hover:border-transparent hover:shadow-lg hover:-translate-y-0.5"
-                style={{ "--family-color": family.color } as React.CSSProperties}
-              >
-                <div
-                  className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl text-2xl shadow-sm"
-                  style={{ background: `${family.color}20` }}
+            {categories.map((family) => {
+              const familyTools = allTools.filter((t) => t.category === family.id);
+              return (
+                <Link
+                  key={family.id}
+                  href={`/tools/${family.id}`}
+                  id={`family-card-${family.id}`}
+                  className="group rounded-2xl border border-border bg-card p-6 transition-all duration-200 hover:border-transparent hover:shadow-lg hover:-translate-y-0.5"
                 >
-                  {family.icon}
-                </div>
-                <h3 className="mb-1 font-semibold">{family.name}</h3>
-                <p className="mb-4 text-xs text-muted-foreground leading-relaxed">
-                  {family.description}
-                </p>
-                <ul className="space-y-1">
-                  {family.tools.slice(0, 3).map((tool) => (
-                    <li key={tool} className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <span className="h-1 w-1 rounded-full bg-muted-foreground/50" />
-                      {tool}
-                    </li>
-                  ))}
-                  <li className="text-xs font-medium" style={{ color: family.color }}>
-                    + more →
-                  </li>
-                </ul>
-              </Link>
-            ))}
+                  <div
+                    className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl text-2xl shadow-sm bg-muted"
+                  >
+                    {family.icon}
+                  </div>
+                  <h3 className="mb-1 font-semibold">{family.name}</h3>
+                  <p className="mb-4 text-xs text-muted-foreground leading-relaxed">
+                    {family.description}
+                  </p>
+                  <ul className="space-y-1">
+                    {familyTools.slice(0, 3).map((tool) => (
+                      <li key={tool.name} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                        <span className="h-1 w-1 rounded-full bg-muted-foreground/50" />
+                        <span className="capitalize">{tool.name.replace(/-/g, ' ')}</span>
+                      </li>
+                    ))}
+                    {familyTools.length > 3 && (
+                      <li className="text-xs font-medium text-muted-foreground mt-2">
+                        + {familyTools.length - 3} more →
+                      </li>
+                    )}
+                  </ul>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -230,15 +165,15 @@ export default function LandingPage() {
             <p className="mt-2 text-muted-foreground">Start with the most-used tools</p>
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {POPULAR_TOOLS.map((tool) => (
+            {popularTools.map((tool) => (
               <Link
                 key={tool.name}
-                href={`/tools/${tool.family}/${tool.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
+                href={`/tools/${tool.category}/${tool.name}`}
                 className="flex items-center gap-4 rounded-xl border border-border bg-card p-4 transition-all hover:border-foreground/20 hover:shadow-sm"
               >
                 <div className="text-xl">🛠️</div>
                 <div>
-                  <p className="text-sm font-semibold">{tool.name}</p>
+                  <p className="text-sm font-semibold capitalize">{tool.name.replace(/-/g, ' ')}</p>
                   <p className="text-xs text-muted-foreground">{tool.description}</p>
                 </div>
                 <svg className="ml-auto h-4 w-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">

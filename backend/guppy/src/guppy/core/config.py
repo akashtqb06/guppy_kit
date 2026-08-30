@@ -49,6 +49,14 @@ class Settings(BaseSettings):
     tool_execution_timeout_seconds: int = 300
     max_artifact_size_bytes: int = 100 * 1024 * 1024  # 100 MB
 
+    # ── Auth / Session ────────────────────────────────────────────────────
+    secret_key: str = Field(
+        default="change-me-in-production-use-a-long-random-secret",
+        description="Secret key for signing session tokens",
+    )
+    session_cookie_name: str = "guppy_session"
+    session_ttl_seconds: int = 86400 * 30  # 30 days
+
 
 def get_settings() -> Settings:
     """Return a cached settings instance."""

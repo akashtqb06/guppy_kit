@@ -76,8 +76,10 @@ def create_app() -> FastAPI:
         logger.info("Shutting down %s", settings.app_name)
 
     # ── Routers ───────────────────────────────────────────────────────────
+    from guppy.api.auth import router as auth_router
     from guppy.api.tools import router as tools_router
 
+    app.include_router(auth_router, prefix=settings.api_prefix)
     app.include_router(tools_router, prefix=settings.api_prefix)
 
     # ── Health check ──────────────────────────────────────────────────────

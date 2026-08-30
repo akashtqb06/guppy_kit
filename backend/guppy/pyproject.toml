@@ -10,9 +10,11 @@ requires-python = ">=3.11"
 dependencies = [
     "alembic>=1.19.1",
     "asyncpg>=0.31.0",
+    "bcrypt>=5.0.0",
     "boto3>=1.43.83",
     "fastapi[standard]>=0.141.1",
     "httpx>=0.28.1",
+    "itsdangerous>=2.2.0",
     "mcp>=2.1.1",
     "pydantic>=2.13.5",
     "pydantic-settings>=2.15.0",
@@ -44,7 +46,7 @@ src = ["src"]
 
 [tool.ruff.lint]
 select = ["E", "W", "F", "I", "B", "C4", "UP", "A", "PT", "RUF", "SIM"]
-ignore = ["A002"]
+ignore = ["A002", "B008"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["guppy"]

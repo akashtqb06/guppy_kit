@@ -50,6 +50,7 @@
   },
   "devDependencies": {
     "@guppy-kit/config": "workspace:*",
+    "@types/node": "^20.19.43",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.5",
     "typescript": "^7.0.2"

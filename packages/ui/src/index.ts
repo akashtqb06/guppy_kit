@@ -20,5 +20,11 @@ export * from "./components/ui/textarea"
 export * from "./components/ui/toggle"
 export * from "./components/ui/tooltip"
 
+// Tool workspace components
+export * from "./components/tool/ToolWorkspace"
+export * from "./components/tool/ToolInput"
+export * from "./components/tool/ToolOutput"
+export * from "./components/tool/ToolToolbar"
+
 // Utilities
 export * from "./lib/utils"

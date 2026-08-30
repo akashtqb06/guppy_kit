@@ -9,7 +9,7 @@ services:
       - ..:/workspace:cached
     command: sleep infinity
     environment:
-      - DATABASE_URL=postgresql://guppy:guppy@postgres:5432/guppy_dev
+      - DATABASE_URL=postgresql+asyncpg://guppy:guppy@postgres:5432/guppy_dev
       - REDIS_URL=redis://redis:6379/0
       - STORAGE_ENDPOINT=http://minio:9000
       - STORAGE_ACCESS_KEY=guppy

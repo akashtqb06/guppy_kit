@@ -4,22 +4,19 @@ set -e
 echo "=== Guppy Kit — Dev Environment Setup ==="
 
 # ── Python Backend ────────────────────────────────────────────────────────────
-echo "→ Installing Python dependencies..."
-cd /workspace/backend
-python -m venv .venv
-source .venv/bin/activate
-pip install --upgrade pip
-pip install -e ".[dev]"
+echo "→ Installing Python dependencies with uv..."
+cd /workspace/backend/guppy
+uv sync
 
 # ── Run DB migrations ─────────────────────────────────────────────────────────
 echo "→ Waiting for PostgreSQL..."
 until pg_isready -h postgres -U guppy; do sleep 1; done
 echo "→ Running migrations..."
-alembic upgrade head
+uv run alembic upgrade head
 
 # ── Seed MinIO bucket ─────────────────────────────────────────────────────────
 echo "→ Creating MinIO bucket..."
-python -c "
+uv run python -c "
 import boto3
 s3 = boto3.client('s3',
     endpoint_url='http://minio:9000',

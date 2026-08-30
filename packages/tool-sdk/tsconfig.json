@@ -3,12 +3,7 @@
   "extends": "@guppy-kit/config/typescript/library",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src",
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ]
-    }
+    "rootDir": "./src"
   },
   "include": [
     "src/**/*"

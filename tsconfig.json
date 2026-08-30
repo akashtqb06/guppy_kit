@@ -9,7 +9,6 @@
   },
   "files": [],
   "references": [
-    { "path": "packages/config" },
     { "path": "packages/types" },
     { "path": "packages/tool-sdk" },
     { "path": "packages/ui" },

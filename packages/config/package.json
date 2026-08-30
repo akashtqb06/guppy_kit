@@ -7,6 +7,7 @@
   "exports": {
     "./typescript/base": "./typescript/base.json",
     "./typescript/nextjs": "./typescript/nextjs.json",
+    "./typescript/library": "./typescript/library.json",
     "./eslint/base": "./eslint/base.js",
     "./eslint/nextjs": "./eslint/nextjs.js",
     "./prettier": "./prettier.js",

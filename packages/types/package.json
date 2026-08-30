@@ -17,5 +17,9 @@
     "type-check": "tsc --noEmit",
     "dev": "tsc --watch"
   },
+  "devDependencies": {
+    "@guppy-kit/config": "workspace:*",
+    "typescript": "^7.0.2"
+  },
   "files": ["dist"]
 }

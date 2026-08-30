@@ -292,11 +292,28 @@ importers:
       '@guppy-kit/types':
         specifier: workspace:*
         version: link:../types
+    devDependencies:
+      '@guppy-kit/config':
+        specifier: workspace:*
+        version: link:../config
+      typescript:
+        specifier: ^7.0.2
+        version: 7.0.2
 
-  packages/types: {}
+  packages/types:
+    devDependencies:
+      '@guppy-kit/config':
+        specifier: workspace:*
+        version: link:../config
+      typescript:
+        specifier: ^7.0.2
+        version: 7.0.2
 
   packages/ui:
     dependencies:
+      '@base-ui/react':
+        specifier: ^1.7.0
+        version: 1.7.0(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@guppy-kit/types':
         specifier: workspace:*
         version: link:../types

@@ -20,5 +20,9 @@
   "dependencies": {
     "@guppy-kit/types": "workspace:*"
   },
+  "devDependencies": {
+    "@guppy-kit/config": "workspace:*",
+    "typescript": "^7.0.2"
+  },
   "files": ["dist"]
 }

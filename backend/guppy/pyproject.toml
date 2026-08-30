@@ -1,7 +1,7 @@
 [project]
 name = "guppy"
 version = "0.1.0"
-description = "Add your description here"
+description = "Guppy Kit — Professional Digital Workbench API (Capability Layer)"
 readme = "README.md"
 authors = [
     { name = "akashtqb", email = "akashtqb06@gmail.com" }
@@ -21,9 +21,6 @@ dependencies = [
     "sqlalchemy[asyncio]>=2.0.52",
 ]
 
-[project.scripts]
-guppy = "guppy:main"
-
 [build-system]
 requires = ["uv_build>=0.12.2,<0.13.0"]
 build-backend = "uv_build"
@@ -37,3 +34,43 @@ dev = [
     "pytest-cov>=7.1.0",
     "ruff>=0.16.5",
 ]
+
+# ── Ruff ──────────────────────────────────────────────────────────────────────
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "C4", "UP", "A", "PT", "RUF", "SIM"]
+ignore = ["A002"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["guppy"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+# ── Mypy ──────────────────────────────────────────────────────────────────────
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+plugins = ["pydantic.mypy"]
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+
+# ── Pytest ────────────────────────────────────────────────────────────────────
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "-v --tb=short --cov=src/guppy --cov-report=term-missing"

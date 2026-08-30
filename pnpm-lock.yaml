@@ -228,15 +228,6 @@ importers:
       '@guppy-kit/ui':
         specifier: workspace:*
         version: link:../../packages/ui
-      class-variance-authority:
-        specifier: ^0.7.1
-        version: 0.7.1
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
-      lucide-react:
-        specifier: ^1.37.0
-        version: 1.37.0(react@19.2.8)
       next:
         specifier: 16.3.3
         version: 16.3.3(@babel/core@7.29.7(supports-color@7.2.0))(@types/node@20.19.43)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -246,15 +237,6 @@ importers:
       react-dom:
         specifier: 19.2.8
         version: 19.2.8(react@19.2.8)
-      shadcn:
-        specifier: ^4.19.0
-        version: 4.19.0(supports-color@7.2.0)(typescript@5.9.3)
-      tailwind-merge:
-        specifier: ^3.6.0
-        version: 3.6.0
-      tw-animate-css:
-        specifier: ^1.4.0
-        version: 1.4.0
     devDependencies:
       '@tailwindcss/postcss':
         specifier: ^4
@@ -357,12 +339,18 @@ importers:
       react-dom:
         specifier: ^19.2.8
         version: 19.2.8(react@19.2.8)
+      shadcn:
+        specifier: ^4.19.0
+        version: 4.19.0(supports-color@7.2.0)(typescript@7.0.2)
       tailwind-merge:
         specifier: ^3.6.0
         version: 3.6.0
       tailwindcss:
         specifier: ^4.3.3
         version: 4.3.3
+      tw-animate-css:
+        specifier: ^1.4.0
+        version: 1.4.0
     devDependencies:
       '@types/react':
         specifier: ^19.2.18
@@ -5583,14 +5571,14 @@ snapshots:
       object-assign: 4.1.1
       vary: 1.1.2
 
-  cosmiconfig@9.0.2(typescript@5.9.3):
+  cosmiconfig@9.0.2(typescript@7.0.2):
     dependencies:
       env-paths: 2.2.1
       import-fresh: 3.3.1
       js-yaml: 4.3.2
       parse-json: 5.2.0
     optionalDependencies:
-      typescript: 5.9.3
+      typescript: 7.0.2
 
   cross-spawn@7.0.6:
     dependencies:
@@ -7222,7 +7210,7 @@ snapshots:
 
   setprototypeof@1.2.0: {}
 
-  shadcn@4.19.0(supports-color@7.2.0)(typescript@5.9.3):
+  shadcn@4.19.0(supports-color@7.2.0)(typescript@7.0.2):
     dependencies:
       '@babel/core': 7.29.7(supports-color@7.2.0)
       '@babel/parser': 7.29.8
@@ -7233,7 +7221,7 @@ snapshots:
       '@types/validate-npm-package-name': 4.0.2
       browserslist: 4.28.8
       commander: 14.0.3
-      cosmiconfig: 9.0.2(typescript@5.9.3)
+      cosmiconfig: 9.0.2(typescript@7.0.2)
       dedent: 1.7.2
       deepmerge: 4.3.1
       diff: 8.0.4

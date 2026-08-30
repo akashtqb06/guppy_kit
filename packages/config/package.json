@@ -1,0 +1,25 @@
+{
+  "name": "@guppy-kit/config",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Shared ESLint, Prettier, TypeScript, and Tailwind config for Guppy Kit",
+  "type": "module",
+  "exports": {
+    "./typescript/base": "./typescript/base.json",
+    "./typescript/nextjs": "./typescript/nextjs.json",
+    "./eslint/base": "./eslint/base.js",
+    "./eslint/nextjs": "./eslint/nextjs.js",
+    "./prettier": "./prettier.js",
+    "./tailwind": "./tailwind/tailwind.config.ts"
+  },
+  "files": [
+    "typescript",
+    "eslint",
+    "tailwind",
+    "prettier.js"
+  ],
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "typescript": "^7.0.2"
+  }
+}

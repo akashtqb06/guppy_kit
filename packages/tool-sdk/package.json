@@ -1,0 +1,24 @@
+{
+  "name": "@guppy-kit/tool-sdk",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Tool contract types and base class stubs for Guppy Kit",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "type-check": "tsc --noEmit",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@guppy-kit/types": "workspace:*"
+  },
+  "files": ["dist"]
+}

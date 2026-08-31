@@ -1,14 +1,32 @@
 "use client";
 import { useEffect, useState } from "react";
-
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import type { CategorySummary } from "@/lib/api";
-import { Button, Badge } from "@guppy-kit/ui";
 import { GuppyLogo } from "@/components/GuppyLogo";
+import { LayoutDashboard, History, FolderClosed, Settings, LogOut, Package2 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  Badge,
+  Avatar,
+  AvatarFallback,
+} from "@guppy-kit/ui";
 
 export function AppShell({
   children,
@@ -20,7 +38,6 @@ export function AppShell({
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const router = useRouter();
-
   const [recentExecCount, setRecentExecCount] = useState(0);
 
   useEffect(() => {
@@ -44,125 +61,122 @@ export function AppShell({
   }
 
   const navItems = [
-    { href: "/dashboard", label: "Dashboard", icon: "⊞" },
-    { href: "/history", label: "History", icon: "🕒" },
-    { href: "/projects", label: "Projects", icon: "📁" },
+    { href: "/dashboard", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
+    { href: "/history", label: "History", icon: <History className="h-4 w-4" /> },
+    { href: "/projects", label: "Projects", icon: <FolderClosed className="h-4 w-4" /> },
     ...categories.map((c) => ({
       href: `/tools/${c.id}`,
       label: c.name,
-      icon: c.icon,
+      icon: <Package2 className="h-4 w-4" />,
     })),
   ];
 
   if (user?.is_admin) {
-    navItems.push({ href: "/admin/users", label: "Admin", icon: "⚙️" });
+    navItems.push({ href: "/admin/users", label: "Admin", icon: <Settings className="h-4 w-4" /> });
   }
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
-      {/* ── Sidebar ── */}
-      <aside
-        id="app-sidebar"
-        className="flex w-56 shrink-0 flex-col border-r border-border bg-sidebar"
-      >
-        {/* Logo */}
-        <div className="flex h-14 items-center gap-2.5 border-b border-sidebar-border px-4">
-          <GuppyLogo size={24} />
-          <span className="text-sm font-bold tracking-tight text-sidebar-foreground">
-            Guppy Kit
-          </span>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto py-3 px-2">
-          <ul className="space-y-0.5" role="list">
-            {navItems.map((item) => {
-              const isActive =
-                pathname === item.href ||
-                (item.href !== "/dashboard" && pathname.startsWith(item.href));
-              return (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors ${
-                      isActive
-                        ? "bg-sidebar-primary/10 text-brand font-medium"
-                        : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground"
-                    }`}
-                  >
-                    <span className="text-base">{item.icon}</span>
-                    {item.label}
-                    {item.href === "/history" && recentExecCount > 0 && (
-                      <Badge variant="secondary" className="ml-auto text-[10px] px-1.5 py-0 h-5 bg-brand text-brand-foreground">
-                        {recentExecCount}
-                      </Badge>
-                    )}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
-
-        {/* User area */}
-        <div className="border-t border-sidebar-border p-3">
-          <div className="flex items-center gap-2.5 rounded-lg px-2 py-2">
-            <div
-              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold bg-brand text-brand-foreground"
-            >
-              {user?.email?.[0]?.toUpperCase() ?? "?"}
+    <SidebarProvider>
+      <div className="flex h-screen w-full bg-background overflow-hidden">
+        {/* ── Sidebar ── */}
+        <Sidebar variant="sidebar" collapsible="icon">
+          <SidebarHeader className="h-14 border-b border-sidebar-border flex items-center px-4">
+            <div className="flex items-center gap-2.5 w-full">
+              <GuppyLogo size={24} />
+              <span className="text-sm font-bold tracking-tight text-sidebar-foreground group-data-[collapsible=icon]:hidden">
+                Guppy Kit
+              </span>
             </div>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-xs font-medium text-sidebar-foreground">
-                {user?.email ?? "…"}
-              </p>
+          </SidebarHeader>
+
+          <SidebarContent>
+            <SidebarGroup>
+              <SidebarMenu>
+                {navItems.map((item) => {
+                  const isActive =
+                    pathname === item.href ||
+                    (item.href !== "/dashboard" && pathname.startsWith(item.href));
+                  return (
+                    <SidebarMenuItem key={item.href}>
+                      <SidebarMenuButton isActive={isActive} tooltip={item.label} render={<Link href={item.href} className="flex items-center gap-2.5" />}>
+                        <span className="text-base">{item.icon}</span>
+                        <span className="flex-1">{item.label}</span>
+                        {item.href === "/history" && recentExecCount > 0 && (
+                          <Badge variant="secondary" className="ml-auto text-[10px] px-1.5 py-0 h-5 bg-brand text-brand-foreground group-data-[collapsible=icon]:hidden">
+                            {recentExecCount}
+                          </Badge>
+                        )}
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroup>
+          </SidebarContent>
+
+          <SidebarFooter className="border-t border-sidebar-border">
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <DropdownMenu>
+                  <DropdownMenuTrigger render={<SidebarMenuButton size="lg" className="w-full" />}>
+                    <Avatar className="h-6 w-6 rounded-md">
+                      <AvatarFallback className="bg-brand text-brand-foreground rounded-md text-xs font-bold">
+                        {user?.email?.[0]?.toUpperCase() ?? "?"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0 flex-1 truncate text-xs font-medium text-sidebar-foreground group-data-[collapsible=icon]:hidden ml-2">
+                      {user?.email ?? "…"}
+                    </div>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuItem className="text-xs text-muted-foreground">
+                      {user?.email}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Log out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarFooter>
+        </Sidebar>
+
+        {/* ── Main content ── */}
+        <div className="flex flex-1 flex-col overflow-hidden w-full relative">
+          {/* Top bar */}
+          <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-background px-4 lg:px-6">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <SidebarTrigger className="-ml-2 mr-2 hidden sm:flex" />
+              <div className="h-4 w-px bg-border mx-2 hidden sm:block" />
+              <Link href="/dashboard" className="hover:text-foreground transition-colors">
+                Home
+              </Link>
+              {pathname !== "/dashboard" && (
+                <>
+                  <span>/</span>
+                  <span className="text-foreground capitalize truncate max-w-[200px]">
+                    {pathname.split("/").filter(Boolean).join(" / ")}
+                  </span>
+                </>
+              )}
             </div>
-            <Button
-              id="app-logout-btn"
-              onClick={handleLogout}
-              title="Sign out"
-              variant="ghost"
-              size="icon"
-            >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-            </Button>
-          </div>
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <Link
+                href="/"
+                className="hidden sm:inline-block rounded-md px-3 py-1.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+              >
+                ← Back to home
+              </Link>
+            </div>
+          </header>
+
+          {/* Page content */}
+          <main className="flex-1 overflow-y-auto">{children}</main>
         </div>
-      </aside>
-
-      {/* ── Main content ── */}
-      <div className="flex flex-1 flex-col overflow-hidden">
-        {/* Top bar */}
-        <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-background px-6">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Link href="/dashboard" className="hover:text-foreground transition-colors">
-              Home
-            </Link>
-            {pathname !== "/dashboard" && (
-              <>
-                <span>/</span>
-                <span className="text-foreground capitalize">
-                  {pathname.split("/").filter(Boolean).join(" / ")}
-                </span>
-              </>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            <Link
-              href="/"
-              className="rounded-md px-3 py-1.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-            >
-              ← Back to home
-            </Link>
-          </div>
-        </header>
-
-        {/* Page content */}
-        <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
-    </div>
+    </SidebarProvider>
   );
 }

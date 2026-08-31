@@ -2,17 +2,17 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Badge, Skeleton, Button, Dialog, DialogContent, DialogHeader, DialogTitle } from "@guppy-kit/ui";
+import { Badge, Skeleton, Button, Dialog, DialogContent, DialogHeader, DialogTitle, Card, Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@guppy-kit/ui";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 interface Execution {
-  execution_id: string;
+  id: string;
   tool_name: string;
   tool_version?: string;
   status: string;
   duration_ms: number;
-  created_at: string;
+  started_at: string;
   input_snapshot?: any;
   artifact_id?: string;
 }
@@ -98,40 +98,38 @@ export default function HistoryPage() {
   return (
     <div className="p-8 max-w-5xl mx-auto">
       <h1 className="text-2xl font-bold tracking-tight mb-8">History</h1>
-      <div className="rounded-xl border border-border bg-card overflow-hidden">
-        <table className="w-full text-sm text-left">
-          <thead className="bg-muted/50 text-muted-foreground border-b border-border">
-            <tr>
-              <th className="px-6 py-4 font-medium">Tool</th>
-              <th className="px-6 py-4 font-medium">Status</th>
-              <th className="px-6 py-4 font-medium">Duration</th>
-              <th className="px-6 py-4 font-medium">Date</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
+      <Card className="overflow-hidden">
+        <Table>
+          <TableHeader className="bg-muted/50">
+            <TableRow>
+              <TableHead className="w-[300px]">Tool</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Duration</TableHead>
+              <TableHead className="text-right">Date</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {executions.map((exec) => (
-              <tr 
-                key={exec.execution_id} 
-                className="hover:bg-muted/30 transition-colors cursor-pointer"
+              <TableRow 
+                key={exec.id} 
+                className="cursor-pointer"
                 onClick={() => setSelectedExec(exec)}
               >
-                <td className="px-6 py-4">
-                  <span className="font-medium text-foreground capitalize">
-                    {exec.tool_name.replace(/-/g, ' ')}
-                  </span>
-                </td>
-                <td className="px-6 py-4">{getStatusBadge(exec.status)}</td>
-                <td className="px-6 py-4 text-muted-foreground">
+                <TableCell className="font-medium capitalize">
+                  {exec.tool_name.replace(/-/g, ' ')}
+                </TableCell>
+                <TableCell>{getStatusBadge(exec.status)}</TableCell>
+                <TableCell className="text-muted-foreground">
                   {exec.duration_ms ? `${exec.duration_ms.toFixed(0)} ms` : "—"}
-                </td>
-                <td className="px-6 py-4 text-muted-foreground">
-                  {new Date(exec.created_at).toLocaleString()}
-                </td>
-              </tr>
+                </TableCell>
+                <TableCell className="text-right text-muted-foreground">
+                  {new Date(exec.started_at).toLocaleString()}
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
-      </div>
+          </TableBody>
+        </Table>
+      </Card>
 
       <Dialog open={!!selectedExec} onOpenChange={(open) => !open && setSelectedExec(null)}>
         <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
@@ -147,7 +145,7 @@ export default function HistoryPage() {
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="text-muted-foreground font-medium mb-1">Started</p>
-                <p>{selectedExec ? new Date(selectedExec.created_at).toLocaleString() : "-"}</p>
+                <p>{selectedExec ? new Date(selectedExec.started_at).toLocaleString() : "-"}</p>
               </div>
               <div>
                 <p className="text-muted-foreground font-medium mb-1">Duration</p>

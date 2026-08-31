@@ -34,7 +34,11 @@ export async function login(email: string, password: string): Promise<User> {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error((err as { detail?: string }).detail ?? "Login failed");
+    let msg = "Login failed";
+    if (err.detail) {
+      msg = Array.isArray(err.detail) ? err.detail.map((e: any) => e.msg || JSON.stringify(e)).join(", ") : String(err.detail);
+    }
+    throw new Error(msg);
   }
   return res.json() as Promise<User>;
 }
@@ -48,7 +52,11 @@ export async function register(email: string, password: string): Promise<User> {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error((err as { detail?: string }).detail ?? "Registration failed");
+    let msg = "Registration failed";
+    if (err.detail) {
+      msg = Array.isArray(err.detail) ? err.detail.map((e: any) => e.msg || JSON.stringify(e)).join(", ") : String(err.detail);
+    }
+    throw new Error(msg);
   }
   return res.json() as Promise<User>;
 }

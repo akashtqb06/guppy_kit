@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card } from "@guppy-kit/ui";
+import { Card, CardHeader, CardTitle, CardContent } from "@guppy-kit/ui";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -29,26 +29,32 @@ export function DashboardStats({ toolsCount, categoriesCount }: { toolsCount: nu
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-10">
-      <Card className="p-5 flex items-center gap-4">
-        <div className="text-3xl">🛠️</div>
-        <div>
-          <p className="text-2xl font-bold">{toolsCount}</p>
-          <p className="text-xs text-muted-foreground uppercase tracking-wider">Tools Available</p>
-        </div>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium uppercase tracking-wider text-muted-foreground">Tools Available</CardTitle>
+          <div className="text-xl">🛠️</div>
+        </CardHeader>
+        <CardContent>
+          <div className="text-3xl font-bold">{toolsCount}</div>
+        </CardContent>
       </Card>
-      <Card className="p-5 flex items-center gap-4">
-        <div className="text-3xl">🗂️</div>
-        <div>
-          <p className="text-2xl font-bold">{categoriesCount}</p>
-          <p className="text-xs text-muted-foreground uppercase tracking-wider">Categories</p>
-        </div>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium uppercase tracking-wider text-muted-foreground">Categories</CardTitle>
+          <div className="text-xl">🗂️</div>
+        </CardHeader>
+        <CardContent>
+          <div className="text-3xl font-bold">{categoriesCount}</div>
+        </CardContent>
       </Card>
-      <Card className="p-5 flex items-center gap-4">
-        <div className="text-3xl">⚡</div>
-        <div>
-          <p className="text-2xl font-bold">{executionsCount !== null ? executionsCount : "..."}</p>
-          <p className="text-xs text-muted-foreground uppercase tracking-wider">Recent Executions</p>
-        </div>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium uppercase tracking-wider text-muted-foreground">Recent Executions</CardTitle>
+          <div className="text-xl">⚡</div>
+        </CardHeader>
+        <CardContent>
+          <div className="text-3xl font-bold">{executionsCount !== null ? executionsCount : "..."}</div>
+        </CardContent>
       </Card>
     </div>
   );

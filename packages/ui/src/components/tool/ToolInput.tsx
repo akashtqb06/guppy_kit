@@ -215,9 +215,15 @@ export function ToolInput({ toolName, values, onChange }: ToolInputProps) {
 
         // text fields
         const isSql = field.name === "sql" || field.name.endsWith("_sql") || field.name === "query";
-        const isJson = field.name === "json" || field.name.endsWith("_json") || field.name.startsWith("json_");
+        const isJson = field.type === "object" || field.type === "array" || field.name === "json" || field.name.endsWith("_json") || field.name.startsWith("json_");
         const isMarkdown = field.name.startsWith("markdown") || field.name.endsWith("_markdown");
-        const isLongText = field.name.endsWith("_text") || field.name === "text" || field.name === "content" || field.name === "input";
+        const isLongText = field.name.endsWith("_text") || field.name === "text" || field.name === "content" || field.name === "input" || field.name.endsWith("_content");
+
+        const getDisplayValue = (v: unknown) => {
+          if (v === undefined || v === null) return "";
+          if (typeof v === "object") return JSON.stringify(v, null, 2);
+          return String(v);
+        };
 
         if (isSql || isJson || isMarkdown || isLongText) {
           let placeholder = "";
@@ -228,11 +234,56 @@ export function ToolInput({ toolName, values, onChange }: ToolInputProps) {
 
           return (
             <div key={field.name} className="space-y-1.5">
-              {labelNode}
+              <div className="flex items-center justify-between">
+                {labelNode}
+                <div>
+                  <input
+                    type="file"
+                    id={`file-upload-text-${toolName}-${field.name}`}
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                          const str = reader.result as string;
+                          if (isJson) {
+                            try {
+                              onChange({ ...values, [field.name]: JSON.parse(str) });
+                              return;
+                            } catch {
+                              // ignore json parse error on upload, fallback to string
+                            }
+                          }
+                          onChange({ ...values, [field.name]: str });
+                        };
+                        reader.readAsText(file);
+                      }
+                    }}
+                  />
+                  <Label
+                    htmlFor={`file-upload-text-${toolName}-${field.name}`}
+                    className="text-[10px] text-brand uppercase cursor-pointer hover:underline"
+                  >
+                    Upload File
+                  </Label>
+                </div>
+              </div>
               <Textarea
                 id={`field-${toolName}-${field.name}`}
-                value={(val as string) ?? field.default ?? ""}
-                onChange={(e) => onChange({ ...values, [field.name]: e.target.value })}
+                value={getDisplayValue(val ?? field.default)}
+                onChange={(e) => {
+                  const str = e.target.value;
+                  if (isJson) {
+                    try {
+                      onChange({ ...values, [field.name]: JSON.parse(str) });
+                      return;
+                    } catch {
+                      // fallback to string if invalid JSON while typing
+                    }
+                  }
+                  onChange({ ...values, [field.name]: str });
+                }}
                 rows={6}
                 placeholder={placeholder}
                 className={className}
@@ -248,7 +299,7 @@ export function ToolInput({ toolName, values, onChange }: ToolInputProps) {
             <Input
               id={`field-${toolName}-${field.name}`}
               type="text"
-              value={(val as string) ?? field.default ?? ""}
+              value={getDisplayValue(val ?? field.default)}
               onChange={(e) => onChange({ ...values, [field.name]: e.target.value })}
             />
           </div>

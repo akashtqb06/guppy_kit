@@ -26,7 +26,45 @@ logger = logging.getLogger(__name__)
 # Map of "<package>.<module>" → list of tool class names to auto-import.
 # Add new tool modules here as they are implemented.
 TOOL_MODULES: list[str] = [
+    # Utilities
     "guppy.tools.utilities.echo",
+    "guppy.tools.utilities.hash_generator",
+    "guppy.tools.utilities.url_encoder",
+    "guppy.tools.utilities.timestamp_converter",
+    "guppy.tools.utilities.color_converter",
+    "guppy.tools.utilities.qr_code_generator",
+    # Developer
+    "guppy.tools.developer.json_formatter",
+    "guppy.tools.developer.base64_encoder",
+    "guppy.tools.developer.uuid_generator",
+    "guppy.tools.developer.jwt_decoder",
+    "guppy.tools.developer.regex_tester",
+    "guppy.tools.developer.cron_parser",
+    # Data
+    "guppy.tools.data.csv_to_json",
+    "guppy.tools.data.json_to_csv",
+    "guppy.tools.data.json_diff",
+    "guppy.tools.data.excel_to_json",
+    "guppy.tools.data.csv_profiler",
+    "guppy.tools.data.json_schema_validator",
+    # Documents
+    "guppy.tools.documents.word_count",
+    "guppy.tools.documents.markdown_to_html",
+    "guppy.tools.documents.text_diff",
+    "guppy.tools.documents.lorem_ipsum",
+    # Database
+    "guppy.tools.database.sql_formatter",
+    "guppy.tools.database.sql_validator",
+    "guppy.tools.database.er_diagram",
+    # Visualization
+    "guppy.tools.visualization.bar_chart",
+    "guppy.tools.visualization.line_chart",
+    "guppy.tools.visualization.pie_chart",
+    "guppy.tools.visualization.mermaid_renderer",
+    # Presentation
+    "guppy.tools.presentation.slide_builder",
+    # Workflow
+    "guppy.tools.workflow.pipeline_validator",
 ]
 
 

@@ -1,0 +1,11 @@
+name: schema-designer
+version: "1.0.0"
+category: database
+description: "Design a database table schema and generate the SQL CREATE TABLE statement."
+tags:
+  - database
+  - sql
+  - schema
+input_artifact_types: []
+output_artifact_type: text
+

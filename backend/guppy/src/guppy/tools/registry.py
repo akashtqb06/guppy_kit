@@ -33,6 +33,7 @@ TOOL_MODULES: list[str] = [
     "guppy.tools.utilities.timestamp_converter",
     "guppy.tools.utilities.color_converter",
     "guppy.tools.utilities.qr_code_generator",
+    "guppy.tools.utilities.password_generator",
     # Developer
     "guppy.tools.developer.json_formatter",
     "guppy.tools.developer.base64_encoder",
@@ -40,6 +41,7 @@ TOOL_MODULES: list[str] = [
     "guppy.tools.developer.jwt_decoder",
     "guppy.tools.developer.regex_tester",
     "guppy.tools.developer.cron_parser",
+    "guppy.tools.developer.http_status_codes",
     # Data
     "guppy.tools.data.csv_to_json",
     "guppy.tools.data.json_to_csv",
@@ -47,6 +49,8 @@ TOOL_MODULES: list[str] = [
     "guppy.tools.data.excel_to_json",
     "guppy.tools.data.csv_profiler",
     "guppy.tools.data.json_schema_validator",
+    "guppy.tools.data.json_to_yaml",
+    "guppy.tools.data.yaml_to_json",
     # Documents
     "guppy.tools.documents.word_count",
     "guppy.tools.documents.markdown_to_html",
@@ -60,6 +64,7 @@ TOOL_MODULES: list[str] = [
     "guppy.tools.database.sql_formatter",
     "guppy.tools.database.sql_validator",
     "guppy.tools.database.er_diagram",
+    "guppy.tools.database.schema_designer",
     # Visualization
     "guppy.tools.visualization.bar_chart",
     "guppy.tools.visualization.line_chart",
@@ -69,6 +74,7 @@ TOOL_MODULES: list[str] = [
     "guppy.tools.presentation.slide_builder",
     # Workflow
     "guppy.tools.workflow.pipeline_validator",
+    "guppy.tools.workflow.data_pipeline_runner",
 ]
 
 

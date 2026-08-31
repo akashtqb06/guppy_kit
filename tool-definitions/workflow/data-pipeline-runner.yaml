@@ -1,0 +1,11 @@
+name: data-pipeline-runner
+version: "1.0.0"
+category: workflow
+description: "Run a CSV data pipeline: parse, filter, sort, and limit rows \u2014 all in one step."
+tags:
+  - csv
+  - pipeline
+  - data
+input_artifact_types: []
+output_artifact_type: json
+

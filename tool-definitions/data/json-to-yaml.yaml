@@ -1,0 +1,11 @@
+name: json-to-yaml
+version: "1.0.0"
+category: data
+description: "Convert JSON data to YAML format."
+tags:
+  - json
+  - yaml
+  - converter
+input_artifact_types: []
+output_artifact_type: text
+

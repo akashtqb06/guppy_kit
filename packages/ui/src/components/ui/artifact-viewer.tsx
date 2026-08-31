@@ -5,21 +5,24 @@ import { Button } from "./button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs"
 import { cn } from "../../lib/utils"
 import mermaid from "mermaid"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./table"
+import { ScrollArea } from "./scroll-area"
+import { Dialog, DialogContent, DialogTitle } from "./dialog"
 
 function JsonTree({ data, depth = 0 }: { data: unknown; depth?: number }) {
   const [isExpanded, setIsExpanded] = React.useState(depth < 5)
 
-  if (data === null) return <span className="text-gray-500">null</span>
-  if (typeof data === "string") return <span className="text-green-600">"{data}"</span>
-  if (typeof data === "number") return <span className="text-blue-600">{data}</span>
-  if (typeof data === "boolean") return <span className="text-purple-600">{data ? "true" : "false"}</span>
+  if (data === null) return <span className="text-muted-foreground">null</span>
+  if (typeof data === "string") return <span className="text-emerald-600 dark:text-emerald-400">"{data}"</span>
+  if (typeof data === "number") return <span className="text-blue-500 dark:text-blue-400">{data}</span>
+  if (typeof data === "boolean") return <span className="text-violet-600 dark:text-violet-400">{data ? "true" : "false"}</span>
 
   if (Array.isArray(data)) {
     if (data.length === 0) return <span>[]</span>
     if (!isExpanded) {
       return (
         <span 
-          className="cursor-pointer text-blue-600 hover:underline" 
+          className="cursor-pointer text-blue-500 dark:text-blue-400 hover:underline" 
           onClick={() => setIsExpanded(true)}
         >
           [...] ({data.length} items)
@@ -48,7 +51,7 @@ function JsonTree({ data, depth = 0 }: { data: unknown; depth?: number }) {
     if (!isExpanded) {
       return (
         <span 
-          className="cursor-pointer text-blue-600 hover:underline" 
+          className="cursor-pointer text-blue-500 dark:text-blue-400 hover:underline" 
           onClick={() => setIsExpanded(true)}
         >
           {"{...}"} ({keys.length} keys)
@@ -61,7 +64,7 @@ function JsonTree({ data, depth = 0 }: { data: unknown; depth?: number }) {
         <div className="ml-4 border-l pl-2">
           {keys.map((key, i) => (
             <div key={key}>
-              <span className="text-gray-700 font-medium">"{key}"</span>:{" "}
+              <span className="text-foreground font-medium">"{key}"</span>:{" "}
               <JsonTree data={(data as Record<string, unknown>)[key]} depth={depth + 1} />
               {i < keys.length - 1 ? "," : ""}
             </div>
@@ -106,6 +109,94 @@ function MermaidDiagram({ chart }: { chart: string }) {
   return <div ref={containerRef} className="w-full overflow-auto rounded-lg border border-border bg-background p-4 flex justify-center" />
 }
 
+function CsvTable({ data }: { data: any[] }) {
+  const [page, setPage] = React.useState(1);
+  const rowsPerPage = 20;
+  
+  if (!data || data.length === 0) return null;
+  
+  const headers = Object.keys(data[0] || {});
+  const totalPages = Math.ceil(data.length / rowsPerPage);
+  const startIdx = (page - 1) * rowsPerPage;
+  const currentRows = data.slice(startIdx, startIdx + rowsPerPage);
+  
+  return (
+    <div className="space-y-4">
+      <ScrollArea className="w-full whitespace-nowrap rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              {headers.map((h, i) => (
+                <TableHead key={i}>{h}</TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {currentRows.map((row, i) => (
+              <TableRow key={i}>
+                {headers.map((h, j) => (
+                  <TableCell key={j}>{String(row[h] ?? "")}</TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </ScrollArea>
+      <div className="flex items-center justify-between">
+        <div className="text-sm text-muted-foreground">
+          Showing {startIdx + 1}–{Math.min(startIdx + rowsPerPage, data.length)} of {data.length} rows
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>Prev</Button>
+          <Button variant="outline" size="sm" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}>Next</Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DownloadButton({ output, artifactType, fileName }: { output: any; artifactType?: string | undefined; fileName?: string | undefined }) {
+  const handleDownload = () => {
+    let content: string;
+    let mime: string;
+    let ext: string;
+    
+    if (artifactType === 'svg' || (typeof output === 'string' && output.trim().startsWith('<svg'))) {
+      content = typeof output === 'string' ? output : JSON.stringify(output);
+      mime = 'image/svg+xml'; ext = 'svg';
+    } else if (artifactType === 'html') {
+      content = typeof output === 'string' ? output : JSON.stringify(output);
+      mime = 'text/html'; ext = 'html';
+    } else if (artifactType === 'csv' || (typeof output === 'object' && output?.csv_content)) {
+      content = output?.csv_content ?? JSON.stringify(output);
+      mime = 'text/csv'; ext = 'csv';
+    } else if (typeof output === 'object') {
+      content = JSON.stringify(output, null, 2);
+      mime = 'application/json'; ext = 'json';
+    } else {
+      content = String(output);
+      mime = 'text/plain'; ext = 'txt';
+    }
+    
+    const blob = new Blob([content], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName ?? `artifact.${ext}`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+  
+  return (
+    <Button variant="outline" size="sm" onClick={handleDownload} className="gap-1.5">
+      <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+      </svg>
+      Download
+    </Button>
+  );
+}
+
 export interface ArtifactViewerProps {
   output: any
   artifactType?: string | undefined;
@@ -114,6 +205,7 @@ export interface ArtifactViewerProps {
 
 export function ArtifactViewer({ output, artifactType, isLoading }: ArtifactViewerProps) {
   const [copied, setCopied] = React.useState(false)
+  const [isExpanded, setIsExpanded] = React.useState(false)
 
   if (isLoading) {
     return (
@@ -146,6 +238,44 @@ export function ArtifactViewer({ output, artifactType, isLoading }: ArtifactView
   }
   const isMermaid = !!mermaidMatch
 
+  let parsedCsvData: any[] | null = null;
+  const isCsvType = artifactType === "csv" || (typeof output === "object" && output?.csv_content) || (typeof output === "object" && Array.isArray(output?.json_data));
+  if (isCsvType) {
+    if (typeof output === "object" && Array.isArray(output.json_data)) {
+      parsedCsvData = output.json_data;
+    } else {
+      const csvString = typeof output === "object" && output?.csv_content ? output.csv_content : outputString;
+      if (typeof csvString === "string") {
+        const lines = csvString.trim().split('\n');
+        if (lines.length > 0) {
+           // basic parse handling simple commas (not inside quotes)
+           const parseLine = (line: string) => {
+             const row = [];
+             let inQuotes = false;
+             let val = '';
+             for (let i = 0; i < line.length; i++) {
+               const char = line[i];
+               if (char === '"') inQuotes = !inQuotes;
+               else if (char === ',' && !inQuotes) { row.push(val); val = ''; }
+               else val += char;
+             }
+             row.push(val);
+             return row;
+           };
+           const headers = parseLine(lines[0] || "").map(h => h.trim());
+           parsedCsvData = lines.slice(1).map(line => {
+             const values = parseLine(line);
+             const obj: any = {};
+             headers.forEach((h, i) => {
+               obj[h] = values[i] !== undefined ? values[i].trim() : "";
+             });
+             return obj;
+           });
+        }
+      }
+    }
+  }
+
   const CopyButton = () => (
     <Button 
       variant="ghost" 
@@ -157,15 +287,24 @@ export function ArtifactViewer({ output, artifactType, isLoading }: ArtifactView
     </Button>
   )
 
-  if (isSvg || isHtml || isMermaid) {
+  if (isSvg || isHtml || isMermaid || isCsvType) {
     return (
       <div className="relative group flex flex-col h-full space-y-2">
         <Tabs defaultValue="preview" className="w-full h-full flex flex-col">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <TabsList>
               <TabsTrigger value="preview">Preview</TabsTrigger>
               <TabsTrigger value="raw">Raw</TabsTrigger>
             </TabsList>
+            <div className="flex items-center gap-2">
+              {isSvg && (
+                <Button variant="ghost" size="sm" onClick={() => setIsExpanded(true)} className="gap-1.5">
+                  <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l5-5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
+                  Expand
+                </Button>
+              )}
+              <DownloadButton output={output} artifactType={artifactType} />
+            </div>
           </div>
           
           <TabsContent value="preview" className="flex-1 min-h-0 mt-2 relative">
@@ -187,6 +326,11 @@ export function ArtifactViewer({ output, artifactType, isLoading }: ArtifactView
             {isMermaid && mermaidMatch && (
               <MermaidDiagram chart={mermaidMatch} />
             )}
+            {isCsvType && parsedCsvData && (
+              <div className="w-full h-full overflow-hidden bg-background p-2">
+                <CsvTable data={parsedCsvData} />
+              </div>
+            )}
           </TabsContent>
           
           <TabsContent value="raw" className="flex-1 min-h-0 mt-2 relative">
@@ -196,6 +340,12 @@ export function ArtifactViewer({ output, artifactType, isLoading }: ArtifactView
             </div>
           </TabsContent>
         </Tabs>
+        <Dialog open={isExpanded} onOpenChange={setIsExpanded}>
+          <DialogContent className="max-w-[90vw] max-h-[90vh] overflow-auto">
+            <DialogTitle>Chart Preview</DialogTitle>
+            <div dangerouslySetInnerHTML={{ __html: outputString }} className="w-full" />
+          </DialogContent>
+        </Dialog>
       </div>
     )
   }
@@ -203,6 +353,9 @@ export function ArtifactViewer({ output, artifactType, isLoading }: ArtifactView
   return (
     <div className="relative group rounded-lg border bg-muted/50 p-4">
       <CopyButton />
+      <div className="absolute top-2 right-12 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+        <DownloadButton output={output} artifactType={artifactType} />
+      </div>
       {isJson && typeof output === "object" ? (
         <div className="text-sm font-mono overflow-auto whitespace-pre-wrap">
           <JsonTree data={output} />

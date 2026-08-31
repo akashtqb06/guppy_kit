@@ -2,7 +2,7 @@ name: "bar-chart"
 version: "1.0.0"
 category: "VISUALIZATION"
 icon: "📊"
-description: "A standard tool implementation."
+description: "Render a polished bar chart as an SVG with grid lines, axis labels, and value annotations."
 tags:
   - visualization
   - utility

@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import type { CategorySummary } from "@/lib/api";
 import { GuppyLogo } from "@/components/GuppyLogo";
-import { LayoutDashboard, History, FolderClosed, Settings, LogOut, Package2 } from "lucide-react";
+import { LayoutDashboard, History, FolderClosed, Settings, LogOut, Package2, Wrench } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   Sidebar,
@@ -62,6 +62,7 @@ export function AppShell({
 
   const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
+    { href: "/tools", label: "All Tools", icon: <Wrench className="h-4 w-4" /> },
     { href: "/history", label: "History", icon: <History className="h-4 w-4" /> },
     { href: "/projects", label: "Projects", icon: <FolderClosed className="h-4 w-4" /> },
     ...categories.map((c) => ({

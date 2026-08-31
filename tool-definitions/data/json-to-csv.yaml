@@ -1,0 +1,10 @@
+name: json-to-csv
+version: "1.0.0"
+category: data
+description: "Convert JSON to CSV."
+tags:
+  - json
+  - data
+  - converter
+input_artifact_types: []
+output_artifact_type: csv

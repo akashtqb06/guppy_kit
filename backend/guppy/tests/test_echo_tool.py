@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from guppy.tools.utilities.echo import EchoInput, EchoOutput, EchoTool
 from guppy.tools.base import NoConfig
+from guppy.tools.utilities.echo import EchoInput, EchoOutput, EchoTool
 
 
 @pytest.fixture
@@ -51,7 +51,7 @@ class TestEchoToolExecution:
 
 class TestEchoInputValidation:
     def test_rejects_empty_message(self) -> None:
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError, match=r".*"):
             EchoInput(message="")
 
     def test_accepts_max_length(self) -> None:
@@ -60,5 +60,5 @@ class TestEchoInputValidation:
         assert len(inp.message) == 10_000
 
     def test_rejects_over_max_length(self) -> None:
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError, match=r".*"):
             EchoInput(message="x" * 10_001)

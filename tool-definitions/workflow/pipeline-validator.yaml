@@ -1,0 +1,10 @@
+name: "pipeline-validator"
+version: "1.0.0"
+category: "WORKFLOW"
+icon: "🔁"
+description: "A standard tool implementation."
+tags:
+  - workflow
+  - utility
+input_artifact_types: []
+output_artifact_type: "JSON"

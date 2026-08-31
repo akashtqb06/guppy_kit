@@ -53,6 +53,7 @@ class CategorySummary(BaseModel):
 
 class ToolSummary(BaseModel):
     name: str
+    icon: str
     version: str
     category: ToolCategory
     description: str
@@ -103,10 +104,7 @@ async def list_categories() -> list[CategorySummary]:
     The order matches the ToolCategory enum definition.
     """
     counts = _tools_by_category()
-    return [
-        _category_summary(meta, counts.get(cat, 0))
-        for cat, meta in CATEGORY_METADATA.items()
-    ]
+    return [_category_summary(meta, counts.get(cat, 0)) for cat, meta in CATEGORY_METADATA.items()]
 
 
 @router.get(

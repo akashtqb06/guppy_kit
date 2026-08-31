@@ -31,6 +31,8 @@ OutputT = TypeVar("OutputT", bound=BaseModel)
 class ToolMetadata(BaseModel):
     """Static metadata declared by every tool."""
 
+    icon: str = "🛠️"
+
     name: str
     version: str
     category: ToolCategory
@@ -46,12 +48,13 @@ class BaseTool(abc.ABC, Generic[InputT, ConfigT, OutputT]):
     """Abstract base class that every Guppy tool must extend."""
 
     # ── Identity — must be set as class-level attributes ──────────────────
+    icon: str = "🛠️"
     name: str
     version: str
     category: ToolCategory
     description: str
-    tags: list[str] = []
-    input_artifact_types: list[ArtifactType] = []
+    tags: list[str] = []  # noqa: RUF012
+    input_artifact_types: list[ArtifactType] = []  # noqa: RUF012
     output_artifact_type: ArtifactType
 
     # ── Schemas — must be set as class-level attributes ───────────────────
@@ -62,7 +65,7 @@ class BaseTool(abc.ABC, Generic[InputT, ConfigT, OutputT]):
     # ── Implementation ────────────────────────────────────────────────────
 
     @abc.abstractmethod
-    async def execute(self, input: InputT, config: ConfigT) -> OutputT:  # noqa: A002
+    async def execute(self, input: InputT, config: ConfigT) -> OutputT:
         """
         Run the tool.
 
@@ -79,6 +82,7 @@ class BaseTool(abc.ABC, Generic[InputT, ConfigT, OutputT]):
         """Return a serialisable metadata snapshot."""
         return ToolMetadata(
             name=cls.name,
+            icon=cls.icon,
             version=cls.version,
             category=cls.category,
             description=cls.description,

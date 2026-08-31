@@ -57,6 +57,11 @@ class Settings(BaseSettings):
     session_cookie_name: str = "guppy_session"
     session_ttl_seconds: int = 86400 * 30  # 30 days
 
+    # ── Admin Seed ────────────────────────────────────────────────────────
+    admin_email: str = Field(default="admin@guppykit.local", description="Admin user email")
+    admin_password: str = Field(default="changeme-admin-123", description="Admin user password")
+    admin_create_on_startup: bool = True
+
 
 def get_settings() -> Settings:
     """Return a cached settings instance."""

@@ -40,9 +40,7 @@ async def get_current_user(
             headers={"WWW-Authenticate": "Cookie"},
         )
 
-    user = await db.scalar(
-        select(User).where(User.id == uuid.UUID(session_data.user_id))
-    )
+    user = await db.scalar(select(User).where(User.id == uuid.UUID(session_data.user_id)))
     if user is None or not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -54,3 +52,11 @@ async def get_current_user(
 
 # Convenience alias
 require_auth = Depends(get_current_user)
+
+
+async def require_admin(current_user: User = Depends(get_current_user)) -> User:
+    if not current_user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Admin privileges required"
+        )
+    return current_user

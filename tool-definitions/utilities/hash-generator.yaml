@@ -1,0 +1,10 @@
+name: hash-generator
+version: "1.0.0"
+category: utilities
+description: "Generate hash from text."
+tags:
+  - hash
+  - utilities
+  - generator
+input_artifact_types: []
+output_artifact_type: text

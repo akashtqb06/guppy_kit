@@ -15,8 +15,8 @@ import importlib
 import logging
 from typing import TYPE_CHECKING
 
-from guppy.tools.base import BaseTool
 from guppy.core.exceptions import ToolNotFoundError
+from guppy.tools.base import BaseTool
 
 if TYPE_CHECKING:
     pass
@@ -70,7 +70,7 @@ class ToolRegistry:
         try:
             return self._tools[name]
         except KeyError:
-            raise ToolNotFoundError(f"Tool '{name}' not found in registry.")
+            raise ToolNotFoundError(f"Tool '{name}' not found in registry.") from None
 
     def list_all(self) -> list[BaseTool]:  # type: ignore[type-arg]
         """Return all registered tool instances."""

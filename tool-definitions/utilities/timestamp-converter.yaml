@@ -1,0 +1,10 @@
+name: timestamp-converter
+version: "1.0.0"
+category: utilities
+description: "Convert timestamps."
+tags:
+  - timestamp
+  - utilities
+  - converter
+input_artifact_types: []
+output_artifact_type: json

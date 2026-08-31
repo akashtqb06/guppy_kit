@@ -108,3 +108,8 @@ async def logout(
 async def me(current_user: User = Depends(get_current_user)) -> User:
     """Return the currently authenticated user's profile."""
     return current_user
+
+
+@router.post("/google", summary="Google OAuth sign-in (placeholder)")
+async def google_signin(body: dict) -> dict:
+    raise HTTPException(501, "Google OAuth is not yet configured")

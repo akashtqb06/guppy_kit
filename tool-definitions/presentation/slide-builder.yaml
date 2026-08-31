@@ -1,0 +1,10 @@
+name: "slide-builder"
+version: "1.0.0"
+category: "PRESENTATION"
+icon: "🎯"
+description: "A standard tool implementation."
+tags:
+  - presentation
+  - utility
+input_artifact_types: []
+output_artifact_type: "JSON"

@@ -43,16 +43,17 @@ class EchoTool(BaseTool[EchoInput, NoConfig, EchoOutput]):
     name = "echo"
     version = "1.0.0"
     category = ToolCategory.UTILITIES
+    icon = "🔊"
     description = "Returns its input unchanged. Used to verify the execution pipeline."
-    tags = ["test", "utilities", "smoke-test"]
-    input_artifact_types = []
+    tags = ["test", "utilities", "smoke-test"]  # noqa: RUF012
+    input_artifact_types = []  # noqa: RUF012
     output_artifact_type = ArtifactType.JSON
 
     input_schema = EchoInput
     output_schema = EchoOutput
     config_schema = NoConfig
 
-    async def execute(self, input: EchoInput, config: NoConfig) -> EchoOutput:  # noqa: A002
+    async def execute(self, input: EchoInput, config: NoConfig) -> EchoOutput:
         return EchoOutput(
             message=input.message,
             metadata=input.metadata,

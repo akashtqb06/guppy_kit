@@ -34,7 +34,7 @@ except s3.exceptions.BucketAlreadyOwnedByYou:
 echo "→ Installing Node dependencies..."
 cd /workspace
 npm install -g pnpm
-pnpm install
+pnpm install --fetch-timeout=600000
 
 echo ""
 echo "=== Setup complete ==="

@@ -1,12 +1,13 @@
 "use client";
 
 /// <reference types="node" />
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { ToolInput } from "./ToolInput";
 import { ToolOutput } from "./ToolOutput";
 import { ToolToolbar } from "./ToolToolbar";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+import { Alert, AlertDescription } from "../ui/alert";
+import { API_BASE } from "../../lib/constants";
 
 export type ToolLayout = "split" | "single" | "canvas";
 
@@ -42,6 +43,21 @@ export function ToolWorkspace({
   const [result, setResult] = useState<ExecutionResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isExecuting, setIsExecuting] = useState(false);
+
+  const [schema, setSchema] = useState<ToolSchema | null>(null);
+
+  useEffect(() => {
+    async function fetchSchema() {
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/tools/${toolName}`);
+        if (res.ok) {
+          const data = await res.json() as ToolSchema;
+          setSchema(data);
+        }
+      } catch (err) {}
+    }
+    fetchSchema();
+  }, [toolName]);
 
   const execute = useCallback(async () => {
     setError(null);
@@ -125,13 +141,13 @@ export function ToolWorkspace({
           </div>
           <div className="flex-1 overflow-auto p-4">
             {error ? (
-              <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
-                {error}
-              </div>
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
             ) : customOutput ? (
               customOutput
             ) : (
-              <ToolOutput output={outputValue} isLoading={isExecuting} />
+              <ToolOutput output={outputValue} isLoading={isExecuting} artifactType={schema?.output_artifact_type} />
             )}
           </div>
         </div>

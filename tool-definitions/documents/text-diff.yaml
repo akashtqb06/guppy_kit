@@ -1,0 +1,10 @@
+name: "text-diff"
+version: "1.0.0"
+category: "DOCUMENTS"
+icon: "🔄"
+description: "A standard tool implementation."
+tags:
+  - documents
+  - utility
+input_artifact_types: []
+output_artifact_type: "TEXT"

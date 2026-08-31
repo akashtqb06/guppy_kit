@@ -1,0 +1,10 @@
+name: color-converter
+version: "1.0.0"
+category: utilities
+description: "Convert colors."
+tags:
+  - color
+  - utilities
+  - converter
+input_artifact_types: []
+output_artifact_type: json

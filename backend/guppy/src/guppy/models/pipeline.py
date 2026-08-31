@@ -57,9 +57,7 @@ class PipelineExecution(Base):
         nullable=False,
         index=True,
     )
-    project_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), nullable=False, index=True
-    )
+    project_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False, index=True)
     # running | completed | failed | partial
     status: Mapped[str] = mapped_column(String(50), nullable=False)
     step_results: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
@@ -68,6 +66,4 @@ class PipelineExecution(Base):
         default=lambda: datetime.now(UTC),
         nullable=False,
     )
-    completed_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

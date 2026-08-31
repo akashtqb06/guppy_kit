@@ -19,6 +19,8 @@ export * from "./components/ui/tabs"
 export * from "./components/ui/textarea"
 export * from "./components/ui/toggle"
 export * from "./components/ui/tooltip"
+export * from "./components/ui/file-upload"
+export * from "./components/ui/artifact-viewer"
 
 // Tool workspace components
 export * from "./components/tool/ToolWorkspace"
@@ -28,3 +30,4 @@ export * from "./components/tool/ToolToolbar"
 
 // Utilities
 export * from "./lib/utils"
+export * from "./lib/constants"

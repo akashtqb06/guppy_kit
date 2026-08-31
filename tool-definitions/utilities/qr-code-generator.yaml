@@ -1,0 +1,10 @@
+name: "qr-code-generator"
+version: "1.0.0"
+category: "UTILITIES"
+icon: "📱"
+description: "A standard tool implementation."
+tags:
+  - utilities
+  - utility
+input_artifact_types: []
+output_artifact_type: "SVG"

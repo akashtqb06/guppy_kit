@@ -3,7 +3,10 @@
 /// <reference types="node" />
 import { useEffect, useState } from "react";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+import { API_BASE } from "../../lib/constants";
+import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
+import { Label } from "../ui/label";
 
 interface ToolInputField {
   name: string;
@@ -63,14 +66,14 @@ export function ToolInput({ toolName, values, onChange }: ToolInputProps) {
   if (fields.length === 0) {
     return (
       <div className="space-y-3">
-        <label className="block text-sm font-medium">Input</label>
-        <textarea
+        <Label htmlFor={`tool-input-${toolName}`}>Input</Label>
+        <Textarea
           id={`tool-input-${toolName}`}
           value={(values["input"] as string) ?? ""}
           onChange={(e) => onChange({ ...values, input: e.target.value })}
           rows={10}
           placeholder="Enter your input here…"
-          className="w-full resize-none rounded-lg border border-input bg-background px-3 py-2.5 text-sm font-mono outline-none transition-colors focus:border-ring focus:ring-2 focus:ring-ring/30"
+          className="font-mono"
         />
       </div>
     );
@@ -80,9 +83,9 @@ export function ToolInput({ toolName, values, onChange }: ToolInputProps) {
     <div className="space-y-4">
       {fields.map((field) => (
         <div key={field.name} className="space-y-1.5">
-          <label
+          <Label
             htmlFor={`field-${toolName}-${field.name}`}
-            className="block text-sm font-medium capitalize"
+            className="capitalize"
           >
             {field.name.replace(/_/g, " ")}
             {field.description && (
@@ -90,26 +93,25 @@ export function ToolInput({ toolName, values, onChange }: ToolInputProps) {
                 — {field.description}
               </span>
             )}
-          </label>
+          </Label>
           {field.type === "string" || field.type === "text" ? (
-            <textarea
+            <Textarea
               id={`field-${toolName}-${field.name}`}
               value={(values[field.name] as string) ?? ""}
               onChange={(e) =>
                 onChange({ ...values, [field.name]: e.target.value })
               }
               rows={6}
-              className="w-full resize-none rounded-lg border border-input bg-background px-3 py-2.5 text-sm font-mono outline-none transition-colors focus:border-ring focus:ring-2 focus:ring-ring/30"
+              className="font-mono"
             />
           ) : (
-            <input
+            <Input
               id={`field-${toolName}-${field.name}`}
               type={field.type === "integer" || field.type === "number" ? "number" : "text"}
               value={(values[field.name] as string) ?? ""}
               onChange={(e) =>
                 onChange({ ...values, [field.name]: e.target.value })
               }
-              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none transition-colors focus:border-ring focus:ring-2 focus:ring-ring/30"
             />
           )}
         </div>

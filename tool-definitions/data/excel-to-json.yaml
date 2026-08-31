@@ -1,0 +1,10 @@
+name: "excel-to-json"
+version: "1.0.0"
+category: "DATA"
+icon: "📗"
+description: "A standard tool implementation."
+tags:
+  - data
+  - utility
+input_artifact_types: []
+output_artifact_type: "JSON"

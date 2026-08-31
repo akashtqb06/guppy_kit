@@ -32,9 +32,7 @@ class Execution(Base):
     input_snapshot: Mapped[dict] = mapped_column(JSONB, nullable=False)
     config_snapshot: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     # FK set on completion
-    artifact_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), nullable=True
-    )
+    artifact_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
     error: Mapped[str | None] = mapped_column(Text, nullable=True)
     started_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -42,9 +40,7 @@ class Execution(Base):
         nullable=False,
         index=True,
     )
-    completed_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     duration_ms: Mapped[float | None] = mapped_column(Float, nullable=True)
     # ui | rest | mcp
     caller_type: Mapped[str] = mapped_column(String(50), nullable=False, default="ui")

@@ -1,0 +1,10 @@
+name: url-encoder
+version: "1.0.0"
+category: utilities
+description: "Encode or decode URL strings."
+tags:
+  - url
+  - utilities
+  - encoder
+input_artifact_types: []
+output_artifact_type: text

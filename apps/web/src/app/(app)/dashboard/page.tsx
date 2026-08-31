@@ -2,6 +2,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { getCategories, getTools } from "@/lib/api";
 
+import { DashboardStats } from "./DashboardStats";
+
 export const metadata: Metadata = { title: "Dashboard" };
 
 export default async function DashboardPage() {
@@ -20,6 +22,9 @@ export default async function DashboardPage() {
         </p>
       </div>
 
+      {/* Stats */}
+      <DashboardStats toolsCount={tools.length} categoriesCount={categories.length} />
+
       {/* Quick access */}
       <section>
         <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
@@ -32,7 +37,7 @@ export default async function DashboardPage() {
               href={`/tools/${tool.category}/${tool.name}`}
               className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 transition-all hover:border-foreground/20 hover:shadow-sm"
             >
-              <span className="text-xl">🛠️</span>
+              <span className="text-xl">{tool.icon || "🛠️"}</span>
               <div>
                 <p className="text-sm font-medium capitalize">{tool.name.replace(/-/g, ' ')}</p>
                 <p className="text-xs text-muted-foreground capitalize">{tool.category}</p>

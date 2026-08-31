@@ -55,7 +55,7 @@ export default async function ToolFamilyPage({ params }: Props) {
               <div
                 className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm bg-muted"
               >
-                🛠️
+                {tool.icon || "🛠️"}
               </div>
               <div>
                 <p className="font-semibold text-sm capitalize">{tool.name.replace(/-/g, ' ')}</p>

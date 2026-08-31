@@ -1,11 +1,14 @@
 "use client";
 
+import { ArtifactViewer } from "../ui/artifact-viewer";
+
 interface ToolOutputProps {
   output: Record<string, unknown> | null;
   isLoading: boolean;
+  artifactType?: string | undefined;
 }
 
-export function ToolOutput({ output, isLoading }: ToolOutputProps) {
+export function ToolOutput({ output, isLoading, artifactType }: ToolOutputProps) {
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
@@ -29,32 +32,11 @@ export function ToolOutput({ output, isLoading }: ToolOutputProps) {
     );
   }
 
-  // Detect single string/text field output
-  const outputKeys = Object.keys(output);
-  const firstKey = outputKeys[0];
-  const primaryValue =
-    outputKeys.length === 1 && firstKey !== undefined
-      ? output[firstKey]
-      : output.result ?? output.output ?? output.text ?? null;
-
-  if (typeof primaryValue === "string") {
-    return (
-      <pre
-        id="tool-output-text"
-        className="whitespace-pre-wrap break-all text-sm font-mono leading-relaxed"
-      >
-        {primaryValue}
-      </pre>
-    );
-  }
-
-  // JSON output
   return (
-    <pre
-      id="tool-output-json"
-      className="whitespace-pre-wrap break-all text-sm font-mono leading-relaxed"
-    >
-      {JSON.stringify(output, null, 2)}
-    </pre>
+    <ArtifactViewer
+      output={output.result ?? output.output ?? output.text ?? output}
+      artifactType={artifactType}
+      isLoading={isLoading}
+    />
   );
 }

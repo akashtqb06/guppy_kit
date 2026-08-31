@@ -17,6 +17,7 @@ export interface ToolSummary {
   version: string;
   category: string;
   description: string;
+  icon?: string;
   tags: string[];
   input_artifact_types: string[];
   output_artifact_type: string;

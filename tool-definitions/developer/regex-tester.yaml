@@ -1,0 +1,10 @@
+name: regex-tester
+version: "1.0.0"
+category: developer
+description: "Test regular expressions."
+tags:
+  - regex
+  - developer
+  - tester
+input_artifact_types: []
+output_artifact_type: json

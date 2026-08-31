@@ -1,0 +1,10 @@
+name: json-diff
+version: "1.0.0"
+category: data
+description: "Compute difference between two JSON objects."
+tags:
+  - json
+  - data
+  - diff
+input_artifact_types: []
+output_artifact_type: json

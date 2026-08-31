@@ -1,6 +1,9 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getCategories, getTools } from "@/lib/api";
+import { Button } from "@guppy-kit/ui";
+import { GuppyLogo } from "@/components/GuppyLogo";
+import { HeroSearch } from "@/components/HeroSearch";
 
 export const metadata: Metadata = {
   title: "Guppy Kit — Professional Digital Workbench",
@@ -20,14 +23,7 @@ export default async function LandingPage() {
       <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-lg">
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-6">
           <div className="flex items-center gap-2">
-            <div
-              className="flex h-7 w-7 items-center justify-center rounded-lg"
-              style={{ background: "oklch(0.5 0.25 264)" }}
-            >
-              <svg className="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" />
-              </svg>
-            </div>
+            <GuppyLogo />
             <span className="text-sm font-bold">Guppy Kit</span>
           </div>
           <div className="flex items-center gap-3">
@@ -40,8 +36,7 @@ export default async function LandingPage() {
             <Link
               href="/register"
               id="nav-get-started"
-              className="rounded-lg px-4 py-1.5 text-sm font-semibold text-white transition-all hover:opacity-90"
-              style={{ background: "oklch(0.5 0.25 264)" }}
+              className="rounded-lg px-4 py-1.5 text-sm font-semibold transition-all hover:opacity-90 bg-brand text-brand-foreground"
             >
               Get started free
             </Link>
@@ -54,19 +49,19 @@ export default async function LandingPage() {
         {/* Gradient background */}
         <div className="pointer-events-none absolute inset-0" aria-hidden="true">
           <div
-            className="absolute left-1/2 top-0 h-[600px] w-[800px] -translate-x-1/2 -translate-y-1/3 rounded-full opacity-15"
-            style={{ background: "radial-gradient(ellipse, oklch(0.6 0.25 264) 0%, transparent 70%)" }}
+            className="absolute left-1/2 top-0 h-[600px] w-[800px] -translate-x-1/2 -translate-y-1/3 rounded-full opacity-15 bg-brand"
+            style={{ backgroundImage: "radial-gradient(ellipse, var(--color-brand) 0%, transparent 70%)" }}
           />
         </div>
         <div className="relative mx-auto max-w-3xl">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-muted px-3 py-1 text-xs text-muted-foreground">
-            <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ background: "oklch(0.65 0.25 160)" }} />
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-brand" />
             Phase 1 — Capability Layer · Open Source MIT
           </div>
           <h1 className="mb-5 text-5xl font-extrabold tracking-tight leading-tight md:text-6xl">
             Your Professional
             <br />
-            <span style={{ color: "oklch(0.55 0.25 264)" }}>Digital Workbench</span>
+            <span className="text-brand">Digital Workbench</span>
           </h1>
           <p className="mb-8 text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
             One place to convert data, design databases, build visualizations, create presentations,
@@ -74,35 +69,19 @@ export default async function LandingPage() {
           </p>
 
           {/* Search bar */}
-          <form
-            id="hero-search-form"
-            className="mx-auto mb-8 flex max-w-xl overflow-hidden rounded-xl border border-border bg-card shadow-lg"
-          >
-            <input
-              id="hero-search"
-              type="search"
-              placeholder="Search tools… e.g. CSV, JWT, SQL, diagram"
-              className="flex-1 bg-transparent px-5 py-3.5 text-sm outline-none placeholder:text-muted-foreground"
-            />
-            <button
-              type="submit"
-              id="hero-search-btn"
-              className="m-1.5 rounded-lg px-5 py-2 text-sm font-semibold text-white"
-              style={{ background: "oklch(0.5 0.25 264)" }}
-            >
-              Search
-            </button>
-          </form>
+          <HeroSearch tools={allTools} />
 
           <div className="flex flex-wrap justify-center gap-2 text-xs text-muted-foreground">
             <span>Popular:</span>
             {popularTools.map((t) => (
-              <button
+              <Button
                 key={t.name}
-                className="rounded-full border border-border px-2.5 py-0.5 transition-colors hover:border-foreground/30 hover:text-foreground capitalize"
+                variant="outline"
+                size="sm"
+                className="rounded-full px-2.5 py-0.5 capitalize"
               >
                 {t.name.replace(/-/g, ' ')}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -171,7 +150,7 @@ export default async function LandingPage() {
                 href={`/tools/${tool.category}/${tool.name}`}
                 className="flex items-center gap-4 rounded-xl border border-border bg-card p-4 transition-all hover:border-foreground/20 hover:shadow-sm"
               >
-                <div className="text-xl">🛠️</div>
+                <div className="text-xl">{tool.icon || "🛠️"}</div>
                 <div>
                   <p className="text-sm font-semibold capitalize">{tool.name.replace(/-/g, ' ')}</p>
                   <p className="text-xs text-muted-foreground">{tool.description}</p>
@@ -233,8 +212,7 @@ export default async function LandingPage() {
           <Link
             href="/register"
             id="cta-get-started"
-            className="inline-flex items-center gap-2 rounded-xl px-8 py-3.5 text-base font-semibold text-white transition-all hover:opacity-90 hover:scale-105"
-            style={{ background: "oklch(0.5 0.25 264)" }}
+            className="inline-flex items-center gap-2 rounded-xl px-8 py-3.5 text-base font-semibold transition-all hover:opacity-90 hover:scale-105 bg-brand text-brand-foreground"
           >
             Start building for free →
           </Link>

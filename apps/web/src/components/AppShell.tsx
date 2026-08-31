@@ -1,10 +1,14 @@
 "use client";
+import { useEffect, useState } from "react";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import type { CategorySummary } from "@/lib/api";
+import { Button, Badge } from "@guppy-kit/ui";
+import { GuppyLogo } from "@/components/GuppyLogo";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export function AppShell({
   children,
@@ -17,6 +21,23 @@ export function AppShell({
   const { user, logout } = useAuth();
   const router = useRouter();
 
+  const [recentExecCount, setRecentExecCount] = useState(0);
+
+  useEffect(() => {
+    async function fetchExecs() {
+      try {
+        const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+        const res = await fetch(`${API_BASE}/api/v1/executions?limit=100`, { credentials: "include" });
+        if (res.ok) {
+          const data = await res.json();
+          const count = Array.isArray(data) ? data.length : (data.items?.length || 0);
+          setRecentExecCount(Math.min(count, 5));
+        }
+      } catch (e) {}
+    }
+    fetchExecs();
+  }, []);
+
   async function handleLogout() {
     await logout();
     router.push("/");
@@ -24,12 +45,18 @@ export function AppShell({
 
   const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: "⊞" },
+    { href: "/history", label: "History", icon: "🕒" },
+    { href: "/projects", label: "Projects", icon: "📁" },
     ...categories.map((c) => ({
       href: `/tools/${c.id}`,
       label: c.name,
       icon: c.icon,
     })),
   ];
+
+  if (user?.is_admin) {
+    navItems.push({ href: "/admin/users", label: "Admin", icon: "⚙️" });
+  }
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
@@ -40,14 +67,7 @@ export function AppShell({
       >
         {/* Logo */}
         <div className="flex h-14 items-center gap-2.5 border-b border-sidebar-border px-4">
-          <div
-            className="flex h-6 w-6 items-center justify-center rounded-md"
-            style={{ background: "oklch(0.5 0.25 264)" }}
-          >
-            <svg className="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" />
-            </svg>
-          </div>
+          <GuppyLogo size={24} />
           <span className="text-sm font-bold tracking-tight text-sidebar-foreground">
             Guppy Kit
           </span>
@@ -72,6 +92,11 @@ export function AppShell({
                   >
                     <span className="text-base">{item.icon}</span>
                     {item.label}
+                    {item.href === "/history" && recentExecCount > 0 && (
+                      <Badge variant="secondary" className="ml-auto text-[10px] px-1.5 py-0 h-5 bg-brand text-brand-foreground">
+                        {recentExecCount}
+                      </Badge>
+                    )}
                   </Link>
                 </li>
               );
@@ -83,8 +108,7 @@ export function AppShell({
         <div className="border-t border-sidebar-border p-3">
           <div className="flex items-center gap-2.5 rounded-lg px-2 py-2">
             <div
-              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
-              style={{ background: "oklch(0.5 0.25 264)" }}
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold bg-brand text-brand-foreground"
             >
               {user?.email?.[0]?.toUpperCase() ?? "?"}
             </div>
@@ -93,16 +117,17 @@ export function AppShell({
                 {user?.email ?? "…"}
               </p>
             </div>
-            <button
+            <Button
               id="app-logout-btn"
               onClick={handleLogout}
               title="Sign out"
-              className="shrink-0 rounded-md p-1 text-sidebar-foreground/60 hover:text-sidebar-foreground transition-colors"
+              variant="ghost"
+              size="icon"
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
-            </button>
+            </Button>
           </div>
         </div>
       </aside>
@@ -125,6 +150,7 @@ export function AppShell({
             )}
           </div>
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             <Link
               href="/"
               className="rounded-md px-3 py-1.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"

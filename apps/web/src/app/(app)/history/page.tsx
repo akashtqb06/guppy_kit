@@ -2,22 +2,28 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Badge, Skeleton, Separator, Button } from "@guppy-kit/ui";
+import { Badge, Skeleton, Button, Dialog, DialogContent, DialogHeader, DialogTitle } from "@guppy-kit/ui";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 interface Execution {
   execution_id: string;
   tool_name: string;
+  tool_version?: string;
   status: string;
   duration_ms: number;
   created_at: string;
+  input_snapshot?: any;
+  artifact_id?: string;
 }
 
 export default function HistoryPage() {
   const [executions, setExecutions] = useState<Execution[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Modal State
+  const [selectedExec, setSelectedExec] = useState<Execution | null>(null);
 
   useEffect(() => {
     async function fetchHistory() {
@@ -104,14 +110,15 @@ export default function HistoryPage() {
           </thead>
           <tbody className="divide-y divide-border">
             {executions.map((exec) => (
-              <tr key={exec.execution_id} className="hover:bg-muted/30 transition-colors">
+              <tr 
+                key={exec.execution_id} 
+                className="hover:bg-muted/30 transition-colors cursor-pointer"
+                onClick={() => setSelectedExec(exec)}
+              >
                 <td className="px-6 py-4">
-                  <Link
-                    href={`/tools/${exec.tool_name.split('-')[0]}/${exec.tool_name}`}
-                    className="font-medium text-foreground hover:underline capitalize"
-                  >
+                  <span className="font-medium text-foreground capitalize">
                     {exec.tool_name.replace(/-/g, ' ')}
-                  </Link>
+                  </span>
                 </td>
                 <td className="px-6 py-4">{getStatusBadge(exec.status)}</td>
                 <td className="px-6 py-4 text-muted-foreground">
@@ -125,6 +132,48 @@ export default function HistoryPage() {
           </tbody>
         </table>
       </div>
+
+      <Dialog open={!!selectedExec} onOpenChange={(open) => !open && setSelectedExec(null)}>
+        <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-3">
+              <span className="capitalize">{selectedExec?.tool_name.replace(/-/g, ' ')}</span>
+              <Badge variant="outline" className="font-normal text-xs">{selectedExec?.tool_version || "1.0.0"}</Badge>
+              {selectedExec && getStatusBadge(selectedExec.status)}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="flex-1 overflow-y-auto space-y-6 py-4">
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <p className="text-muted-foreground font-medium mb-1">Started</p>
+                <p>{selectedExec ? new Date(selectedExec.created_at).toLocaleString() : "-"}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground font-medium mb-1">Duration</p>
+                <p>{selectedExec?.duration_ms ? `${selectedExec.duration_ms.toFixed(0)} ms` : "-"}</p>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-muted-foreground font-medium text-sm">Input Snapshot</p>
+              <pre className="p-4 rounded-lg bg-muted text-xs overflow-x-auto border">
+                {JSON.stringify(selectedExec?.input_snapshot || { message: "No input provided" }, null, 2)}
+              </pre>
+            </div>
+
+            {selectedExec?.artifact_id && (
+              <div className="space-y-2 pt-2 border-t">
+                <p className="text-muted-foreground font-medium text-sm mb-2">Artifact</p>
+                <Button variant="outline">
+                  <span className="mr-2">⬇️</span>
+                  Download Artifact ({selectedExec.artifact_id})
+                </Button>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

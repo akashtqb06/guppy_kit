@@ -5,6 +5,7 @@ import { useCallback, useState, useEffect } from "react";
 import { ToolInput } from "./ToolInput";
 import { ToolOutput } from "./ToolOutput";
 import { ToolToolbar } from "./ToolToolbar";
+import { Button } from "../ui/button";
 
 import { Alert, AlertDescription } from "../ui/alert";
 import { API_BASE } from "../../lib/constants";
@@ -82,7 +83,27 @@ export function ToolWorkspace({
     }
   }, [toolName, inputValues]);
 
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault();
+        if (!isExecuting) execute();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [execute, isExecuting]);
+
   const outputValue = result?.output ?? null;
+
+  let executionStatusNode = null;
+  if (isExecuting) {
+    executionStatusNode = <span className="ml-auto text-xs text-muted-foreground">⏳ Running...</span>;
+  } else if (error) {
+    executionStatusNode = <span className="ml-auto text-xs text-red-500">❌ Failed</span>;
+  } else if (result && result.status === "completed") {
+    executionStatusNode = <span className="ml-auto text-xs text-green-600">✅ {result.duration_ms.toFixed(0)}ms</span>;
+  }
 
   return (
     <div id={`tool-workspace-${toolName}`} className="flex h-full flex-col overflow-hidden">
@@ -115,6 +136,9 @@ export function ToolWorkspace({
             <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Input
             </span>
+            <Button variant="ghost" size="sm" onClick={() => setInputValues({})} className="ml-auto h-7 text-xs">
+              Clear
+            </Button>
           </div>
           <div className="flex-1 overflow-auto p-4">
             {customInput ?? (
@@ -133,11 +157,7 @@ export function ToolWorkspace({
             <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Output
             </span>
-            {result && (
-              <span className="ml-auto text-xs text-muted-foreground">
-                {result.duration_ms.toFixed(1)} ms
-              </span>
-            )}
+            {executionStatusNode}
           </div>
           <div className="flex-1 overflow-auto p-4">
             {error ? (

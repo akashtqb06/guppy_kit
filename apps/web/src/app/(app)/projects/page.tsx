@@ -139,9 +139,9 @@ export default function ProjectsPage() {
               <p className="text-sm text-muted-foreground line-clamp-2 mb-6 flex-1">
                 {project.description || "No description provided."}
               </p>
-              <Button variant="secondary" className="w-full">
-                Open
-              </Button>
+              <Link href={`/projects/${project.id}`}>
+                <Button variant="outline" size="sm" className="w-full">Open →</Button>
+              </Link>
             </Card>
           ))}
         </div>

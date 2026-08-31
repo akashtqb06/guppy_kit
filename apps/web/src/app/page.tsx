@@ -145,20 +145,22 @@ export default async function LandingPage() {
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {popularTools.map((tool) => (
-              <Link
+              <div
                 key={tool.name}
-                href={`/tools/${tool.category}/${tool.name}`}
                 className="flex items-center gap-4 rounded-xl border border-border bg-card p-4 transition-all hover:border-foreground/20 hover:shadow-sm"
               >
                 <div className="text-xl">{tool.icon || "🛠️"}</div>
                 <div>
                   <p className="text-sm font-semibold capitalize">{tool.name.replace(/-/g, ' ')}</p>
-                  <p className="text-xs text-muted-foreground">{tool.description}</p>
+                  <p className="text-xs text-muted-foreground mb-2">{tool.description}</p>
+                  <Link href={`/tools/${tool.category}/${tool.name}`} className="text-xs text-brand hover:underline">
+                    Try it →
+                  </Link>
                 </div>
                 <svg className="ml-auto h-4 w-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
-              </Link>
+              </div>
             ))}
           </div>
         </div>

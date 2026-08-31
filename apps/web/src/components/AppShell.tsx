@@ -86,8 +86,8 @@ export function AppShell({
                     href={item.href}
                     className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors ${
                       isActive
-                        ? "bg-sidebar-primary/10 text-sidebar-primary font-medium"
-                        : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                        ? "bg-sidebar-primary/10 text-brand font-medium"
+                        : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground"
                     }`}
                   >
                     <span className="text-base">{item.icon}</span>

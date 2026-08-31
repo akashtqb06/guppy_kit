@@ -1,0 +1,6 @@
+name: pptx-exporter
+version: "1.0.0"
+category: presentation
+icon: "📊"
+description: Export a slide presentation to PowerPoint format.
+tags: [pptx, powerpoint, presentation, export]

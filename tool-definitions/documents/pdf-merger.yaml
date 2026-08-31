@@ -1,0 +1,6 @@
+name: pdf-merger
+version: "1.0.0"
+category: documents
+icon: "📎"
+description: Merge multiple PDF files into a single PDF.
+tags: [pdf, merge, combine, documents]

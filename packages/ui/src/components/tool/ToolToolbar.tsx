@@ -30,12 +30,19 @@ export function ToolToolbar({
   onExecute,
 }: ToolToolbarProps) {
   const [copied, setCopied] = useState(false);
+  const [urlCopied, setUrlCopied] = useState(false);
 
   async function handleCopy() {
     if (!output) return;
     await navigator.clipboard.writeText(JSON.stringify(output, null, 2));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  }
+
+  async function handleShare() {
+    await navigator.clipboard.writeText(window.location.href);
+    setUrlCopied(true);
+    setTimeout(() => setUrlCopied(false), 2000);
   }
 
   function handleDownload() {
@@ -76,6 +83,27 @@ export function ToolToolbar({
       {/* Actions */}
       <div className="flex items-center gap-2">
         <TooltipProvider>
+          {/* Share */}
+          {hasOutput && (
+            <Tooltip>
+              <TooltipTrigger>
+                <Button
+                  id={`toolbar-share-${toolName}`}
+                  onClick={handleShare}
+                  variant="ghost"
+                  size="sm"
+                  className="gap-1.5 text-muted-foreground"
+                >
+                  <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                  </svg>
+                  {urlCopied ? "Copied URL!" : "Share"}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Copy page URL</TooltipContent>
+            </Tooltip>
+          )}
+
           {/* Copy */}
           {hasOutput && (
             <Tooltip>
@@ -91,10 +119,10 @@ export function ToolToolbar({
                   <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
                   </svg>
-                  {copied ? "Copied!" : "Copy"}
+                  {copied ? "Copied Data!" : "Copy Data"}
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Copy output</TooltipContent>
+              <TooltipContent>Copy output JSON</TooltipContent>
             </Tooltip>
           )}
 
@@ -116,7 +144,7 @@ export function ToolToolbar({
                   Download
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Download JSON</TooltipContent>
+              <TooltipContent>{artifactId ? "Download artifact" : "Download JSON"}</TooltipContent>
             </Tooltip>
           )}
 
@@ -144,29 +172,34 @@ export function ToolToolbar({
             </TooltipTrigger>
             <TooltipContent>View API Docs</TooltipContent>
           </Tooltip>
+        
+          {/* Run button */}
+          <Tooltip>
+            <TooltipTrigger>
+              <Button
+                id={`toolbar-run-${toolName}`}
+                onClick={onExecute}
+                disabled={isExecuting}
+                className="gap-1.5 bg-brand text-brand-foreground hover:bg-brand/90"
+              >
+                {isExecuting ? (
+                  <>
+                    <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                    Running…
+                  </>
+                ) : (
+                  <>
+                    <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3l14 9-14 9V3z" />
+                    </svg>
+                    Run
+                  </>
+                )}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Run Tool (Ctrl+⏎)</TooltipContent>
+          </Tooltip>
         </TooltipProvider>
-
-        {/* Run button */}
-        <Button
-          id={`toolbar-run-${toolName}`}
-          onClick={onExecute}
-          disabled={isExecuting}
-          className="gap-1.5 bg-brand text-brand-foreground hover:bg-brand/90"
-        >
-          {isExecuting ? (
-            <>
-              <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-              Running…
-            </>
-          ) : (
-            <>
-              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3l14 9-14 9V3z" />
-              </svg>
-              Run
-            </>
-          )}
-        </Button>
       </div>
     </div>
   );

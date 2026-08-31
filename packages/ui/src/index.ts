@@ -21,6 +21,7 @@ export * from "./components/ui/toggle"
 export * from "./components/ui/tooltip"
 export * from "./components/ui/file-upload"
 export * from "./components/ui/artifact-viewer"
+export * from "./components/ui/rich-text-editor"
 
 // Tool workspace components
 export * from "./components/tool/ToolWorkspace"
@@ -31,3 +32,8 @@ export * from "./components/tool/ToolToolbar"
 // Utilities
 export * from "./lib/utils"
 export * from "./lib/constants"
+export * from "./components/ui/sidebar"
+export * from "./hooks/use-mobile"
+export * from "./components/ui/table"
+export * from "./components/ui/avatar"
+export * from "./components/ui/breadcrumb"

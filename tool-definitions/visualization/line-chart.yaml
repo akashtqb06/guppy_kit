@@ -2,7 +2,7 @@ name: "line-chart"
 version: "1.0.0"
 category: "VISUALIZATION"
 icon: "📈"
-description: "A standard tool implementation."
+description: "Render a polished line chart as SVG with grid lines, data point markers, and axis labels."
 tags:
   - visualization
   - utility

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose, Input, Textarea, Card, Badge, DialogTrigger } from "@guppy-kit/ui";
+import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose, Input, Textarea, Card, CardHeader, CardTitle, CardContent, CardFooter, Badge, DialogTrigger } from "@guppy-kit/ui";
 import Link from "next/link";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
@@ -129,19 +129,25 @@ export default function ProjectsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {projects.map((project) => (
-            <Card key={project.id} className="p-6 flex flex-col hover:border-foreground/20 transition-colors">
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="font-semibold text-lg line-clamp-1">{project.name}</h3>
-                <Badge variant="outline" className="text-[10px]">
-                  {new Date(project.created_at).toLocaleDateString()}
-                </Badge>
-              </div>
-              <p className="text-sm text-muted-foreground line-clamp-2 mb-6 flex-1">
-                {project.description || "No description provided."}
-              </p>
-              <Button variant="secondary" className="w-full">
-                Open
-              </Button>
+            <Card key={project.id} className="flex flex-col hover:border-foreground/20 transition-colors">
+              <CardHeader className="pb-3">
+                <div className="flex justify-between items-start">
+                  <CardTitle className="text-lg line-clamp-1" title={project.name}>{project.name}</CardTitle>
+                  <Badge variant="outline" className="text-[10px] whitespace-nowrap ml-2">
+                    {new Date(project.created_at).toLocaleDateString()}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="flex-1">
+                <p className="text-sm text-muted-foreground line-clamp-2">
+                  {project.description || "No description provided."}
+                </p>
+              </CardContent>
+              <CardFooter>
+                <Link href={`/projects/${project.id}`} className="w-full">
+                  <Button variant="outline" size="sm" className="w-full">Open →</Button>
+                </Link>
+              </CardFooter>
             </Card>
           ))}
         </div>

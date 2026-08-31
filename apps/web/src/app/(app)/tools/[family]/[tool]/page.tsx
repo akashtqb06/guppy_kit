@@ -1,5 +1,6 @@
+import Link from "next/link";
 import type { Metadata } from "next";
-import { ToolWorkspace } from "@guppy-kit/ui";
+import { ToolPageClient } from "./ToolPageClient";
 
 interface Props {
   params: Promise<{ family: string; tool: string }>;
@@ -14,12 +15,39 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return { title: name };
 }
 
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@guppy-kit/ui";
+
 export default async function ToolPage({ params }: Props) {
-  const { tool } = await params;
+  const { tool, family } = await params;
+  
+  const name = tool
+    .split("-")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+    
+  const familyName = family
+    .split("-")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
 
   return (
-    <div className="h-[calc(100vh-3.5rem)]">
-      <ToolWorkspace toolName={tool} layout="split" />
+    <div className="h-[calc(100vh-3.5rem)] flex flex-col">
+      <div className="px-6 py-4 border-b border-border">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink render={<Link href={`/tools/${family}`} />}>{familyName}</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{name}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
+      <div className="flex-1 min-h-0">
+        <ToolPageClient tool={tool} />
+      </div>
     </div>
   );
 }

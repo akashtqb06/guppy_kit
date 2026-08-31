@@ -1,0 +1,6 @@
+name: pdf-to-text
+version: "1.0.0"
+category: documents
+icon: "📄"
+description: Extract text content from a PDF file.
+tags: [pdf, text, extract, documents]

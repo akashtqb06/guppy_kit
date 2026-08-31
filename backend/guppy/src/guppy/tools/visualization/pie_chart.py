@@ -12,8 +12,8 @@ class PieChartInput(BaseModel):
     labels: list[str]
     values: list[float]
     title: str = ""
-    width: int = 600
-    height: int = 400
+    width: int = 800
+    height: int = 500
 
 
 class PieChartOutput(BaseModel):
@@ -26,8 +26,10 @@ class PieChartTool(BaseTool[PieChartInput, NoConfig, PieChartOutput]):
     name = "pie-chart"
     version = "1.0.0"
     category = ToolCategory.VISUALIZATION
-    description = "A standard tool implementation."
-    tags = ["visualization", "utility"]  # noqa: RUF012
+    description = (
+        "Render a polished pie chart as SVG with percentage labels and a color-coded legend."
+    )
+    tags = ["visualization", "utility", "chart", "pie"]  # noqa: RUF012
     input_artifact_types = []  # noqa: RUF012
     output_artifact_type = ArtifactType.SVG
     icon = "🥧"
@@ -38,20 +40,40 @@ class PieChartTool(BaseTool[PieChartInput, NoConfig, PieChartOutput]):
 
     async def execute(self, input: PieChartInput, config: NoConfig) -> PieChartOutput:
         total = sum(input.values)
-        cx, cy = input.width / 2 - 50, input.height / 2
-        r = min(cx, cy) - 40
+
+        # Adjust center to leave room for right-side legend
+        cx, cy = (input.width * 0.4), input.height / 2
+        r = min(cx, cy) - 60
 
         svg = [
             f'<svg viewBox="0 0 {input.width} {input.height}" width="{input.width}" height="{input.height}" xmlns="http://www.w3.org/2000/svg">'  # noqa: E501
         ]
+
+        # Defs for shadow
+        svg.append("<defs>")
+        svg.append('<filter id="pie-shadow" x="-20%" y="-20%" width="140%" height="140%">')
+        svg.append('<feDropShadow dx="0" dy="4" stdDeviation="4" flood-opacity="0.15" />')
+        svg.append("</filter>")
+        svg.append("</defs>")
+
         svg.append(f'<rect width="{input.width}" height="{input.height}" fill="white" />')
 
         if input.title:
             svg.append(
-                f'<text x="{input.width / 2}" y="30" font-family="sans-serif" font-size="20" font-weight="bold" text-anchor="middle">{input.title}</text>'  # noqa: E501
+                f'<text x="{input.width / 2}" y="40" font-family="sans-serif" font-size="22" font-weight="bold" text-anchor="middle" fill="#1f2937">{input.title}</text>'  # noqa: E501
             )
 
-        colors = ["#6366f1", "#ec4899", "#14b8a6", "#f59e0b", "#8b5cf6", "#ef4444", "#10b981"]
+        # New Color Palette
+        colors = [
+            "#6366f1",
+            "#f59e0b",
+            "#10b981",
+            "#f43f5e",
+            "#3b82f6",
+            "#8b5cf6",
+            "#06b6d4",
+            "#84cc16",
+        ]
 
         start_angle = 0
         for i, (label, val) in enumerate(zip(input.labels, input.values, strict=False)):
@@ -69,17 +91,34 @@ class PieChartTool(BaseTool[PieChartInput, NoConfig, PieChartOutput]):
 
             color = colors[i % len(colors)]
             if val == total:
-                svg.append(f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="{color}" />')
+                svg.append(
+                    f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="{color}" filter="url(#pie-shadow)" stroke="white" stroke-width="2" />'  # noqa: E501
+                )
             else:
                 path = f"M {cx} {cy} L {x1} {y1} A {r} {r} 0 {large_arc} 1 {x2} {y2} Z"
-                svg.append(f'<path d="{path}" fill="{color}" />')
+                svg.append(
+                    f'<path d="{path}" fill="{color}" filter="url(#pie-shadow)" stroke="white" stroke-width="2" />'  # noqa: E501
+                )
 
-            # legend
-            leg_x = cx + r + 40
-            leg_y = cy - r + i * 20
-            svg.append(f'<rect x="{leg_x}" y="{leg_y}" width="10" height="10" fill="{color}" />')
+            # Percentage labels on each slice
+            if angle > 0.1:  # Only show if slice is large enough
+                mid_angle = start_angle + angle / 2
+                label_r = r * 0.6  # Position label slightly more than half-way out
+                lx = cx + label_r * math.cos(mid_angle)
+                ly = cy + label_r * math.sin(mid_angle)
+                pct = (val / total) * 100
+                svg.append(
+                    f'<text x="{lx}" y="{ly + 5}" font-family="sans-serif" font-size="14" font-weight="bold" fill="white" text-anchor="middle">{pct:.1f}%</text>'  # noqa: E501
+                )
+
+            # Legend on the right side
+            leg_x = cx + r + 80
+            leg_y = cy - r + i * 30
             svg.append(
-                f'<text x="{leg_x + 15}" y="{leg_y + 10}" font-family="sans-serif" font-size="12">{label} ({val})</text>'  # noqa: E501
+                f'<rect x="{leg_x}" y="{leg_y}" width="16" height="16" fill="{color}" rx="4" />'
+            )
+            svg.append(
+                f'<text x="{leg_x + 24}" y="{leg_y + 13}" font-family="sans-serif" font-size="14" fill="#4b5563">{label} ({val})</text>'  # noqa: E501
             )
 
             start_angle = end_angle

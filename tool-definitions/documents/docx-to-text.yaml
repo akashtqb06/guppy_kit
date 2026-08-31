@@ -1,0 +1,6 @@
+name: docx-to-text
+version: "1.0.0"
+category: documents
+icon: "📝"
+description: Extract plain text from a Microsoft Word (.docx) file.
+tags: [docx, word, text, extract, documents]

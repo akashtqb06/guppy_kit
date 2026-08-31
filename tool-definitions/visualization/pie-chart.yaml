@@ -2,7 +2,7 @@ name: "pie-chart"
 version: "1.0.0"
 category: "VISUALIZATION"
 icon: "🥧"
-description: "A standard tool implementation."
+description: "Render a polished pie chart as SVG with percentage labels and a color-coded legend."
 tags:
   - visualization
   - utility

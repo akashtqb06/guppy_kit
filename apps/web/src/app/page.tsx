@@ -56,22 +56,34 @@ export default async function LandingPage() {
         <div className="relative mx-auto max-w-3xl">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-muted px-3 py-1 text-xs text-muted-foreground">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-brand" />
-            Phase 1 — Capability Layer · Open Source MIT
+            40+ Professional Tools · Open Source
           </div>
-          <h1 className="mb-5 text-5xl font-extrabold tracking-tight leading-tight md:text-6xl">
-            Your Professional
-            <br />
-            <span className="text-brand">Digital Workbench</span>
+          <h1 className="mb-5 text-5xl font-black tracking-tight sm:text-7xl">
+            The workbench for
+            <span className="block mt-1" style={{ color: 'var(--color-brand)' }}>modern builders.</span>
           </h1>
           <p className="mb-8 text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-            One place to convert data, design databases, build visualizations, create presentations,
-            and run developer utilities — all composable, all with a REST API and MCP interface.
+            40+ professional tools for data, documents, databases, and developer workflows. All in one place. No installs.
           </p>
+          <div className="mb-12 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              href="/register"
+              className="rounded-lg px-6 py-3 text-base font-semibold transition-all hover:opacity-90 bg-brand text-brand-foreground"
+            >
+              Get started free
+            </Link>
+            <Link
+              href="/tools"
+              className="rounded-lg px-6 py-3 text-base font-semibold transition-all hover:bg-muted bg-background border border-border text-foreground"
+            >
+              Explore tools &rarr;
+            </Link>
+          </div>
 
           {/* Search bar */}
           <HeroSearch tools={allTools} />
 
-          <div className="flex flex-wrap justify-center gap-2 text-xs text-muted-foreground">
+          <div className="mt-6 flex flex-wrap justify-center gap-2 text-xs text-muted-foreground">
             <span>Popular:</span>
             {popularTools.map((t) => (
               <Button
@@ -82,6 +94,21 @@ export default async function LandingPage() {
               >
                 {t.name.replace(/-/g, ' ')}
               </Button>
+            ))}
+          </div>
+
+          <div className="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-4 text-left">
+            {[
+              { icon: "⚡", title: "Instant Results", desc: "No setup, no installs" },
+              { icon: "🔗", title: "Artifact Chaining", desc: "Tools feed into each other" },
+              { icon: "🔒", title: "Private by Default", desc: "Your data stays yours" },
+              { icon: "🛠️", title: "40+ Tools", desc: "Across 8 categories" },
+            ].map((f) => (
+              <div key={f.title} className="bg-muted/50 rounded-xl p-4">
+                <div className="text-2xl mb-2">{f.icon}</div>
+                <div className="font-semibold text-sm">{f.title}</div>
+                <div className="text-xs text-muted-foreground">{f.desc}</div>
+              </div>
             ))}
           </div>
         </div>
@@ -107,9 +134,7 @@ export default async function LandingPage() {
                   id={`family-card-${family.id}`}
                   className="group rounded-2xl border border-border bg-card p-6 transition-all duration-200 hover:border-transparent hover:shadow-lg hover:-translate-y-0.5"
                 >
-                  <div
-                    className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl text-2xl shadow-sm bg-muted"
-                  >
+                  <div className="h-10 w-10 rounded-lg bg-brand/10 flex items-center justify-center text-lg mb-3">
                     {family.icon}
                   </div>
                   <h3 className="mb-1 font-semibold">{family.name}</h3>
@@ -148,14 +173,14 @@ export default async function LandingPage() {
               <Link
                 key={tool.name}
                 href={`/tools/${tool.category}/${tool.name}`}
-                className="flex items-center gap-4 rounded-xl border border-border bg-card p-4 transition-all hover:border-foreground/20 hover:shadow-sm"
+                className="flex items-center gap-4 rounded-xl border border-border bg-card p-4 transition-all hover:border-foreground/20 hover:shadow-sm group"
               >
-                <div className="text-xl">{tool.icon || "🛠️"}</div>
-                <div>
-                  <p className="text-sm font-semibold capitalize">{tool.name.replace(/-/g, ' ')}</p>
-                  <p className="text-xs text-muted-foreground">{tool.description}</p>
+                <div className="text-xl shrink-0">{tool.icon || "🛠️"}</div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold capitalize truncate">{tool.name.replace(/-/g, ' ')} <span className="font-normal text-muted-foreground ml-1">· {tool.category}</span></p>
+                  <p className="text-xs text-muted-foreground line-clamp-1">{tool.description}</p>
                 </div>
-                <svg className="ml-auto h-4 w-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="ml-auto h-4 w-4 text-muted-foreground opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </Link>
@@ -220,14 +245,8 @@ export default async function LandingPage() {
       </section>
 
       {/* ── Footer ── */}
-      <footer className="border-t border-border px-6 py-8">
-        <div className="mx-auto flex max-w-7xl items-center justify-between text-xs text-muted-foreground">
-          <span>© 2026 Guppy Kit — MIT License</span>
-          <div className="flex gap-4">
-            <Link href="/docs" className="hover:text-foreground transition-colors">Docs</Link>
-            <Link href="https://github.com" className="hover:text-foreground transition-colors">GitHub</Link>
-          </div>
-        </div>
+      <footer className="border-t border-border py-8 px-6 text-center text-xs text-muted-foreground">
+        <p>Guppy Kit · Open Source · MIT License</p>
       </footer>
     </div>
   );

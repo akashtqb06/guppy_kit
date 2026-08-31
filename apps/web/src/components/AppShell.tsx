@@ -147,29 +147,11 @@ export function AppShell({
         <div className="flex flex-1 flex-col overflow-hidden w-full relative">
           {/* Top bar */}
           <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-background px-4 lg:px-6">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <SidebarTrigger className="-ml-2 mr-2 hidden sm:flex" />
-              <div className="h-4 w-px bg-border mx-2 hidden sm:block" />
-              <Link href="/dashboard" className="hover:text-foreground transition-colors">
-                Home
-              </Link>
-              {pathname !== "/dashboard" && (
-                <>
-                  <span>/</span>
-                  <span className="text-foreground capitalize truncate max-w-[200px]">
-                    {pathname.split("/").filter(Boolean).join(" / ")}
-                  </span>
-                </>
-              )}
+            <div className="flex items-center gap-2">
+              <SidebarTrigger className="-ml-2" />
             </div>
             <div className="flex items-center gap-2">
               <ThemeToggle />
-              <Link
-                href="/"
-                className="hidden sm:inline-block rounded-md px-3 py-1.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-              >
-                ← Back to home
-              </Link>
             </div>
           </header>
 

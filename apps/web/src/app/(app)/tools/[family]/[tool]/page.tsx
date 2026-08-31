@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Metadata } from "next";
 import { ToolWorkspace } from "@guppy-kit/ui";
 
@@ -14,7 +15,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return { title: name };
 }
 
-import { Breadcrumb } from "@/components/Breadcrumb";
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@guppy-kit/ui";
 
 export default async function ToolPage({ params }: Props) {
   const { tool, family } = await params;
@@ -32,10 +33,17 @@ export default async function ToolPage({ params }: Props) {
   return (
     <div className="h-[calc(100vh-3.5rem)] flex flex-col">
       <div className="px-6 py-4 border-b border-border">
-        <Breadcrumb items={[
-          { label: familyName, href: `/tools/${family}` },
-          { label: name }
-        ]} />
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink render={<Link href={`/tools/${family}`} />}>{familyName}</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{name}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
       </div>
       <div className="flex-1 min-h-0">
         <ToolWorkspace toolName={tool} layout="split" />

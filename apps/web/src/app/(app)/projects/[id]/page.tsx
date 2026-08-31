@@ -6,9 +6,9 @@ import Link from "next/link";
 import { 
   Card, CardHeader, CardTitle, CardContent, CardDescription,
   Badge, Button, Tabs, TabsContent, TabsList, TabsTrigger,
-  Skeleton, Separator
+  Skeleton, Separator,
+  Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage
 } from "@guppy-kit/ui";
-import { Breadcrumb } from "@/components/Breadcrumb";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -109,10 +109,17 @@ export default function ProjectWorkspacePage() {
 
   return (
     <div className="p-8 max-w-5xl mx-auto space-y-8">
-      <Breadcrumb items={[
-        { label: "Projects", href: "/projects" },
-        { label: project.name }
-      ]} />
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink render={<Link href="/projects" />}>Projects</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{project.name}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
       
       <div>
         <h1 className="text-3xl font-bold tracking-tight mb-2">{project.name}</h1>

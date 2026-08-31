@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getCategories, getTools } from "@/lib/api";
-import { Badge } from "@guppy-kit/ui";
+import { Badge, Card, CardHeader, CardTitle, CardContent, CardDescription, Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@guppy-kit/ui";
 
 interface Props {
   params: Promise<{ family: string }>;
@@ -13,8 +13,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const info = categories.find((c) => c.id === family);
   return { title: info?.name ?? family };
 }
-
-import { Breadcrumb } from "@/components/Breadcrumb";
 
 export default async function ToolFamilyPage({ params }: Props) {
   const { family } = await params;
@@ -34,10 +32,17 @@ export default async function ToolFamilyPage({ params }: Props) {
 
   return (
     <div className="px-8 py-8 max-w-4xl space-y-6">
-      <Breadcrumb items={[
-        { label: "Tools", href: "/dashboard" },
-        { label: info.name }
-      ]} />
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink render={<Link href="/dashboard" />}>Tools</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{info.name}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
       <div className="flex items-center gap-4">
         <span className="text-4xl">{info.icon}</span>
         <div>

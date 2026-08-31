@@ -21,6 +21,7 @@ export * from "./components/ui/toggle"
 export * from "./components/ui/tooltip"
 export * from "./components/ui/file-upload"
 export * from "./components/ui/artifact-viewer"
+export * from "./components/ui/rich-text-editor"
 
 // Tool workspace components
 export * from "./components/tool/ToolWorkspace"

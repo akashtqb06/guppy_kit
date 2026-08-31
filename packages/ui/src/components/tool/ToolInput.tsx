@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Switch } from "../ui/switch";
 import { FileUpload } from "../ui/file-upload";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
+import { RichTextEditor } from "../ui/rich-text-editor";
 
 interface ToolInputField {
   name: string;
@@ -269,25 +270,41 @@ export function ToolInput({ toolName, values, onChange }: ToolInputProps) {
                   </Label>
                 </div>
               </div>
-              <Textarea
-                id={`field-${toolName}-${field.name}`}
-                value={getDisplayValue(val ?? field.default)}
-                onChange={(e) => {
-                  const str = e.target.value;
-                  if (isJson) {
-                    try {
-                      onChange({ ...values, [field.name]: JSON.parse(str) });
-                      return;
-                    } catch {
-                      // fallback to string if invalid JSON while typing
+              {isMarkdown ? (
+                <RichTextEditor
+                  mode="rich"
+                  value={getDisplayValue(val ?? field.default)}
+                  onChange={(str) => onChange({ ...values, [field.name]: str })}
+                  placeholder={placeholder}
+                />
+              ) : isSql || isJson ? (
+                <RichTextEditor
+                  mode="code"
+                  language={isSql ? 'sql' : isJson ? 'json' : 'plaintext'}
+                  value={getDisplayValue(val ?? field.default)}
+                  onChange={(str) => {
+                    if (isJson) {
+                      try {
+                        onChange({ ...values, [field.name]: JSON.parse(str) });
+                        return;
+                      } catch {
+                        // fallback to string if invalid JSON while typing
+                      }
                     }
-                  }
-                  onChange({ ...values, [field.name]: str });
-                }}
-                rows={6}
-                placeholder={placeholder}
-                className={className}
-              />
+                    onChange({ ...values, [field.name]: str });
+                  }}
+                  placeholder={placeholder}
+                />
+              ) : (
+                <Textarea
+                  id={`field-${toolName}-${field.name}`}
+                  value={getDisplayValue(val ?? field.default)}
+                  onChange={(e) => onChange({ ...values, [field.name]: e.target.value })}
+                  rows={6}
+                  placeholder={placeholder}
+                  className={className}
+                />
+              )}
             </div>
           );
         }

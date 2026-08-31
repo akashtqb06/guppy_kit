@@ -26,7 +26,11 @@ import {
   Badge,
   Avatar,
   AvatarFallback,
+  SidebarGroupLabel,
+  SidebarGroupContent,
 } from "@guppy-kit/ui";
+import { CommandPalette } from "@/components/CommandPalette";
+import { Search } from "lucide-react";
 
 export function AppShell({
   children,
@@ -39,6 +43,33 @@ export function AppShell({
   const { user, logout } = useAuth();
   const router = useRouter();
   const [recentExecCount, setRecentExecCount] = useState(0);
+  const [commandOpen, setCommandOpen] = useState(false);
+  const [tools, setTools] = useState<any[]>([]);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setCommandOpen(true);
+      }
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, []);
+
+  useEffect(() => {
+    async function fetchTools() {
+      try {
+        const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+        const res = await fetch(`${API_BASE}/api/v1/tools`);
+        if (res.ok) {
+          const data = await res.json();
+          setTools(data);
+        }
+      } catch (e) {}
+    }
+    fetchTools();
+  }, []);
 
   useEffect(() => {
     async function fetchExecs() {
@@ -60,58 +91,81 @@ export function AppShell({
     router.push("/");
   }
 
-  const navItems = [
-    { href: "/dashboard", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
-    { href: "/tools", label: "All Tools", icon: <Wrench className="h-4 w-4" /> },
-    { href: "/history", label: "History", icon: <History className="h-4 w-4" /> },
-    { href: "/projects", label: "Projects", icon: <FolderClosed className="h-4 w-4" /> },
-    ...categories.map((c) => ({
-      href: `/tools/${c.id}`,
-      label: c.name,
-      icon: <Package2 className="h-4 w-4" />,
-    })),
-  ];
-
-  if (user?.is_admin) {
-    navItems.push({ href: "/admin/users", label: "Admin", icon: <Settings className="h-4 w-4" /> });
-  }
-
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full bg-background overflow-hidden">
         {/* ── Sidebar ── */}
         <Sidebar variant="sidebar" collapsible="icon">
-          <SidebarHeader className="h-14 border-b border-sidebar-border flex items-center px-4">
+          <SidebarHeader className="h-14 border-b border-sidebar-border flex flex-col justify-center px-4 py-2 gap-2 h-auto">
             <div className="flex items-center gap-2.5 w-full">
               <GuppyLogo size={24} />
               <span className="text-sm font-bold tracking-tight text-sidebar-foreground group-data-[collapsible=icon]:hidden">
                 Guppy Kit
               </span>
             </div>
+            <SidebarMenuButton
+              className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+              onClick={() => setCommandOpen(true)}
+            >
+              <Search className="h-4 w-4" />
+              <span className="text-sm group-data-[collapsible=icon]:hidden">Search tools...</span>
+              <kbd className="ml-auto text-[10px] font-mono bg-muted px-1.5 py-0.5 rounded border border-border group-data-[collapsible=icon]:hidden">⌘K</kbd>
+            </SidebarMenuButton>
           </SidebarHeader>
 
           <SidebarContent>
+            {/* Group 1: Platform */}
             <SidebarGroup>
-              <SidebarMenu>
-                {navItems.map((item) => {
-                  const isActive =
-                    pathname === item.href ||
-                    (item.href !== "/dashboard" && pathname.startsWith(item.href));
-                  return (
-                    <SidebarMenuItem key={item.href}>
-                      <SidebarMenuButton isActive={isActive} tooltip={item.label} render={<Link href={item.href} className="flex items-center gap-2.5" />}>
-                        <span className="text-base">{item.icon}</span>
-                        <span className="flex-1">{item.label}</span>
-                        {item.href === "/history" && recentExecCount > 0 && (
-                          <Badge variant="secondary" className="ml-auto text-[10px] px-1.5 py-0 h-5 bg-brand text-brand-foreground group-data-[collapsible=icon]:hidden">
-                            {recentExecCount}
-                          </Badge>
-                        )}
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-                })}
-              </SidebarMenu>
+              <SidebarGroupLabel>Platform</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {[
+                    { href: "/dashboard", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
+                    { href: "/tools", label: "All Tools", icon: <Wrench className="h-4 w-4" /> },
+                    { href: "/projects", label: "Projects", icon: <FolderClosed className="h-4 w-4" /> },
+                    { href: "/history", label: "History", icon: <History className="h-4 w-4" /> },
+                    ...(user?.is_admin ? [{ href: "/admin/users", label: "Admin", icon: <Settings className="h-4 w-4" /> }] : []),
+                  ].map((item) => {
+                    const isActive =
+                      pathname === item.href ||
+                      (item.href !== "/dashboard" && pathname.startsWith(item.href));
+                    return (
+                      <SidebarMenuItem key={item.href}>
+                        <SidebarMenuButton isActive={isActive} tooltip={item.label} render={<Link href={item.href} className="flex items-center gap-2.5" />}>
+                          <span className="text-base">{item.icon}</span>
+                          <span className="flex-1 group-data-[collapsible=icon]:hidden">{item.label}</span>
+                          {item.href === "/history" && recentExecCount > 0 && (
+                            <Badge variant="secondary" className="ml-auto text-[10px] px-1.5 py-0 h-5 bg-brand text-brand-foreground group-data-[collapsible=icon]:hidden">
+                              {recentExecCount}
+                            </Badge>
+                          )}
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    );
+                  })}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+
+            {/* Group 2: Tool Families */}
+            <SidebarGroup>
+              <SidebarGroupLabel>Tool Families</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {categories.map((c) => {
+                    const href = `/tools/${c.id}`;
+                    const isActive = pathname.startsWith(href);
+                    return (
+                      <SidebarMenuItem key={c.id}>
+                        <SidebarMenuButton isActive={isActive} tooltip={c.name} render={<Link href={href} className="flex items-center gap-2.5" />}>
+                          <span className="text-base"><Package2 className="h-4 w-4" /></span>
+                          <span className="flex-1 group-data-[collapsible=icon]:hidden">{c.name}</span>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    );
+                  })}
+                </SidebarMenu>
+              </SidebarGroupContent>
             </SidebarGroup>
           </SidebarContent>
 
@@ -160,6 +214,7 @@ export function AppShell({
           <main className="flex-1 overflow-y-auto">{children}</main>
         </div>
       </div>
+      <CommandPalette open={commandOpen} onOpenChange={setCommandOpen} tools={tools} />
     </SidebarProvider>
   );
 }

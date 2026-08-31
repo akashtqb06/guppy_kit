@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ToolWorkspace } from "@guppy-kit/ui";
+import { ToolPageClient } from "./ToolPageClient";
 
 interface Props {
   params: Promise<{ family: string; tool: string }>;
@@ -46,7 +46,7 @@ export default async function ToolPage({ params }: Props) {
         </Breadcrumb>
       </div>
       <div className="flex-1 min-h-0">
-        <ToolWorkspace toolName={tool} layout="split" />
+        <ToolPageClient tool={tool} />
       </div>
     </div>
   );

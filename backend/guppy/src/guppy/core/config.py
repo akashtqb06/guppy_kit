@@ -57,6 +57,12 @@ class Settings(BaseSettings):
     session_cookie_name: str = "guppy_session"
     session_ttl_seconds: int = 86400 * 30  # 30 days
 
+    # ── Auth hardening ────────────────────────────────────────────────────
+    auth_max_login_attempts: int = 5
+    auth_lockout_window_seconds: int = 900  # 15 minutes
+    auth_lockout_duration_seconds: int = 900  # 15 minutes
+    password_min_length: int = 8
+
     # ── Admin Seed ────────────────────────────────────────────────────────
     admin_email: str = Field(default="admin@guppykit.com", description="Admin user email")
     admin_password: str = Field(default="changeme-admin-123", description="Admin user password")

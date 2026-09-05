@@ -3,7 +3,7 @@
 /// <reference types="node" />
 import { useCallback, useState, useEffect, useRef } from "react";
 // @ts-ignore
-import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from "react-resizable-panels";
 import { ToolInput } from "./ToolInput";
 import { ToolOutput } from "./ToolOutput";
 import { ToolToolbar } from "./ToolToolbar";

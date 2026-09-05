@@ -281,6 +281,19 @@ importers:
         specifier: ^5
         version: 5.9.3
 
+  packages/auth-sdk:
+    dependencies:
+      next:
+        specifier: '>=14'
+        version: 16.3.3(@babel/core@7.29.7(supports-color@7.2.0))(@types/node@20.19.43)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      react:
+        specifier: ^18 || ^19
+        version: 19.2.8
+    devDependencies:
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
   packages/config:
     devDependencies:
       '@eslint/js':

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Cookie, Depends, HTTPException, Request, Response, status
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,9 +12,12 @@ from guppy.auth.schemas import UserCreate, UserLogin, UserRead
 from guppy.auth.service import (
     EmailAlreadyRegisteredError,
     InvalidCredentialsError,
+    LoginRateLimitError,
     authenticate_user,
+    clear_failed_attempts,
     create_session,
     create_user,
+    delete_session,
 )
 from guppy.core.config import get_settings
 from guppy.core.db import get_db
@@ -44,59 +47,53 @@ async def register(
         raise HTTPException(status_code=exc.status_code, detail=exc.message) from exc
 
 
-@router.post(
-    "/login",
-    response_model=UserRead,
-    summary="Log in and receive a session cookie",
-)
+@router.post("/login", response_model=UserRead)
 async def login(
     body: UserLogin,
+    request: Request,
     response: Response,
     db: AsyncSession = Depends(get_db),
     redis: Redis = Depends(get_redis),  # type: ignore[type-arg]
 ) -> User:
-    """
-    Authenticate with email + password.
+    ip = request.headers.get(
+        "X-Forwarded-For", request.client.host if request.client else "unknown"
+    )
+    ip = ip.split(",")[0].strip()  # Take first IP if proxied
 
-    On success, sets an HttpOnly `guppy_session` cookie valid for
-    `session_ttl_seconds` (default 30 days).
-    """
     try:
-        user = await authenticate_user(db, body.email, body.password)
+        user = await authenticate_user(db, body.email, body.password, ip, redis)
+    except LoginRateLimitError as exc:
+        raise HTTPException(
+            status_code=429,
+            detail=exc.message,
+            headers={"Retry-After": str(exc.retry_after)},
+        ) from exc
     except InvalidCredentialsError as exc:
         raise HTTPException(status_code=exc.status_code, detail=exc.message) from exc
 
+    await clear_failed_attempts(redis, ip)  # Reset counter on success
     session_id = await create_session(redis, user.id)
-
     response.set_cookie(
         key=_COOKIE_NAME,
         value=session_id,
         httponly=True,
         samesite="lax",
         max_age=_COOKIE_TTL,
-        # secure=True in production — omit for local HTTP dev
         secure=not settings.debug,
         path="/",
     )
     return user
 
 
-@router.post(
-    "/logout",
-    status_code=status.HTTP_204_NO_CONTENT,
-    summary="Log out and clear the session cookie",
-)
+@router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
 async def logout(
     response: Response,
+    guppy_session: str | None = Cookie(default=None, alias="guppy_session"),
     current_user: User = Depends(get_current_user),
     redis: Redis = Depends(get_redis),  # type: ignore[type-arg]
 ) -> None:
-    """Invalidate the current session and clear the cookie."""
-    # We don't have direct access to the session_id here — we re-read it.
-    # In practice the dependency resolved it, but to keep it simple we
-    # just delete the cookie client-side and rely on cookie clearing.
-    # For a full invalidation, get_current_user should return the session_id too.
-    # This is safe: the session TTL will expire it naturally.
+    if guppy_session:
+        await delete_session(redis, guppy_session)  # ACTUALLY delete from Redis
     response.delete_cookie(key=_COOKIE_NAME, path="/")
 
 

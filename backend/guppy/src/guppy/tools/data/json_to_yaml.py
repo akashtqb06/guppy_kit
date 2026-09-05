@@ -49,4 +49,3 @@ class JsonToYamlTool(BaseTool[JsonToYamlInput, NoConfig, JsonToYamlOutput]):
 
         yaml_content = yaml.dump(parsed, indent=input.indent, sort_keys=False)
         return JsonToYamlOutput(yaml_content=yaml_content, key_count=k_count)
-

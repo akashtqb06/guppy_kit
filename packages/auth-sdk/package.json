@@ -1,0 +1,15 @@
+{
+  "name": "@guppy-kit/auth-sdk",
+  "version": "0.1.0",
+  "description": "Reusable auth context, RBAC hooks, and permission gates for Guppy Kit apps",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "peerDependencies": {
+    "react": "^18 || ^19",
+    "next": ">=14"
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}
+

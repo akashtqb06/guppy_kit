@@ -59,6 +59,8 @@ TOOL_MODULES: list[str] = [
     "guppy.tools.documents.pdf_to_text",
     "guppy.tools.documents.pdf_merger",
     "guppy.tools.documents.docx_to_text",
+    "guppy.tools.documents.pdf_generator",
+    "guppy.tools.documents.html_to_pdf",
     "guppy.tools.presentation.pptx_exporter",
     # Database
     "guppy.tools.database.sql_formatter",

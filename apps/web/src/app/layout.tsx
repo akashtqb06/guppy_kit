@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
-import Script from "next/script";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 
@@ -33,19 +32,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
-        {/* Inline theme init — runs before paint to prevent flash of wrong theme */}
-        <Script
-          id="theme-init"
-          strategy="beforeInteractive"
+        {/* Inline theme init — plain <script> is valid in App Router <head> */}
+        {/* eslint-disable-next-line @next/next/no-before-interactive-script-outside-document */}
+        <script
           dangerouslySetInnerHTML={{
-            __html: `try {
-              var t = localStorage.getItem('theme');
-              if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.documentElement.classList.add('dark');
-              } else {
-                document.documentElement.classList.remove('dark');
-              }
-            } catch(e) {}`,
+            __html: `try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark')}else{document.documentElement.classList.remove('dark')}}catch(e){}`,
           }}
         />
       </head>

@@ -1,14 +1,9 @@
-import { Skeleton } from '@guppy-kit/ui';
-
 export default function Loading() {
   return (
-    <div className="flex flex-col gap-4 p-6">
-      <Skeleton className="h-8 w-64" />
-      <Skeleton className="h-4 w-96" />
-      <div className="grid grid-cols-3 gap-4 mt-4">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <Skeleton key={i} className="h-32 rounded-xl" />
-        ))}
+    <div className="flex min-h-[60vh] items-center justify-center">
+      <div className="flex flex-col items-center gap-3">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-muted border-t-foreground" />
+        <p className="text-sm text-muted-foreground">Loading…</p>
       </div>
     </div>
   );

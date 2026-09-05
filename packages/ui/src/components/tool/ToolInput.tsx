@@ -10,6 +10,9 @@ import { Switch } from "../ui/switch";
 import { FileUpload } from "../ui/file-upload";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { RichTextEditor } from "../ui/rich-text-editor";
+import { CodeEditor } from "../ui/code-editor";
+import { JsonEditor } from "../ui/json-editor";
+import { Button } from "../ui/button";
 
 interface ToolInputField {
   name: string;
@@ -219,6 +222,7 @@ export function ToolInput({ toolName, values, onChange }: ToolInputProps) {
         const isJson = field.type === "object" || field.type === "array" || field.name === "json" || field.name.endsWith("_json") || field.name.startsWith("json_");
         const isMarkdown = field.name.startsWith("markdown") || field.name.endsWith("_markdown");
         const isLongText = field.name.endsWith("_text") || field.name === "text" || field.name === "content" || field.name === "input" || field.name.endsWith("_content");
+        const isCsv = field.name.includes("csv") || field.type === "csv";
 
         const getDisplayValue = (v: unknown) => {
           if (v === undefined || v === null) return "";
@@ -226,17 +230,42 @@ export function ToolInput({ toolName, values, onChange }: ToolInputProps) {
           return String(v);
         };
 
-        if (isSql || isJson || isMarkdown || isLongText) {
+        if (isSql || isJson || isMarkdown || isLongText || isCsv) {
           let placeholder = "";
-          let className = "";
-          if (isSql) className = "font-mono text-sm";
-          else if (isJson) { className = "font-mono text-sm"; placeholder = '{"key": "value"}'; }
+          if (isJson) { placeholder = '{"key": "value"}'; }
           else if (isMarkdown) placeholder = "# Heading\n\nText";
+
+          const handleFieldChange = (name: string, str: string) => {
+            if (isJson) {
+              try {
+                onChange({ ...values, [name]: JSON.parse(str) });
+                return;
+              } catch {
+                // fallback to string if invalid JSON while typing
+              }
+            }
+            onChange({ ...values, [name]: str });
+          };
 
           return (
             <div key={field.name} className="space-y-1.5">
               <div className="flex items-center justify-between">
-                {labelNode}
+                <div className="flex items-center gap-2">
+                  {labelNode}
+                  {isJson && (
+                    <Button type="button" variant="ghost" size="sm"
+                      onClick={() => {
+                        const sample = field.default !== undefined 
+                          ? JSON.stringify(field.default, null, 2)
+                          : field.type === "array" ? "[]" : "{}";
+                        handleFieldChange(field.name, sample);
+                      }}
+                      className="h-6 text-[11px] px-2"
+                    >
+                      Use sample
+                    </Button>
+                  )}
+                </div>
                 <div>
                   <input
                     type="file"
@@ -248,15 +277,7 @@ export function ToolInput({ toolName, values, onChange }: ToolInputProps) {
                         const reader = new FileReader();
                         reader.onload = () => {
                           const str = reader.result as string;
-                          if (isJson) {
-                            try {
-                              onChange({ ...values, [field.name]: JSON.parse(str) });
-                              return;
-                            } catch {
-                              // ignore json parse error on upload, fallback to string
-                            }
-                          }
-                          onChange({ ...values, [field.name]: str });
+                          handleFieldChange(field.name, str);
                         };
                         reader.readAsText(file);
                       }
@@ -277,32 +298,32 @@ export function ToolInput({ toolName, values, onChange }: ToolInputProps) {
                   onChange={(str) => onChange({ ...values, [field.name]: str })}
                   placeholder={placeholder}
                 />
-              ) : isSql || isJson ? (
-                <RichTextEditor
-                  mode="code"
-                  language={isSql ? 'sql' : isJson ? 'json' : 'plaintext'}
+              ) : isSql ? (
+                <CodeEditor
+                  language="sql"
                   value={getDisplayValue(val ?? field.default)}
-                  onChange={(str) => {
-                    if (isJson) {
-                      try {
-                        onChange({ ...values, [field.name]: JSON.parse(str) });
-                        return;
-                      } catch {
-                        // fallback to string if invalid JSON while typing
-                      }
-                    }
-                    onChange({ ...values, [field.name]: str });
-                  }}
-                  placeholder={placeholder}
+                  onChange={(str) => handleFieldChange(field.name, str)}
+                  height="220px"
+                />
+              ) : isJson ? (
+                <JsonEditor
+                  value={getDisplayValue(val ?? field.default)}
+                  onChange={(str) => handleFieldChange(field.name, str)}
+                  height="220px"
+                />
+              ) : isCsv ? (
+                <CodeEditor
+                  language="csv"
+                  value={getDisplayValue(val ?? field.default)}
+                  onChange={(str) => handleFieldChange(field.name, str)}
+                  height="200px"
                 />
               ) : (
-                <Textarea
-                  id={`field-${toolName}-${field.name}`}
+                <CodeEditor
+                  language="plaintext"
                   value={getDisplayValue(val ?? field.default)}
-                  onChange={(e) => onChange({ ...values, [field.name]: e.target.value })}
-                  rows={6}
-                  placeholder={placeholder}
-                  className={className}
+                  onChange={(str) => handleFieldChange(field.name, str)}
+                  height="160px"
                 />
               )}
             </div>

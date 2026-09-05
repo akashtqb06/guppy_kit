@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Button, Badge, Input } from "@guppy-kit/ui";
 import type { ToolSummary } from "@/lib/api";
+import { CategoryIcon } from "@/lib/icons";
 
 export function HeroSearch({ tools }: { tools: ToolSummary[] }) {
   const [query, setQuery] = useState("");
@@ -93,7 +94,7 @@ export function HeroSearch({ tools }: { tools: ToolSummary[] }) {
                   className="flex items-center gap-3 rounded-lg p-2 hover:bg-muted transition-colors"
                   onClick={() => setIsOpen(false)}
                 >
-                  <span className="text-xl">{t.icon || "🛠️"}</span>
+                  <CategoryIcon category={t.category ?? (t as any).family ?? "utilities"} className="h-5 w-5 text-muted-foreground" />
                   <div className="flex flex-col">
                     <span className="text-sm font-semibold capitalize">{t.name.replace(/-/g, " ")}</span>
                     <span className="text-xs text-muted-foreground line-clamp-1">{t.description}</span>

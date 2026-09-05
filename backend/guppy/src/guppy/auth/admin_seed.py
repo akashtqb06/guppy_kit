@@ -70,9 +70,7 @@ async def seed_admin_user(db: AsyncSession) -> None:
 
     # Eagerly load roles for existing users; initialize to [] for new users.
     admin_user = await db.scalar(
-        select(User)
-        .where(User.email == settings.admin_email)
-        .options(selectinload(User.roles))
+        select(User).where(User.email == settings.admin_email).options(selectinload(User.roles))
     )
     if not admin_user:
         hashed = hash_password(settings.admin_password)

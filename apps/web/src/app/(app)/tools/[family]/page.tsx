@@ -1,7 +1,10 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getCategories, getTools } from "@/lib/api";
-import { Badge, Card, CardHeader, CardTitle, CardContent, CardDescription, Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@guppy-kit/ui";
+import { Badge, Card, CardContent, CardHeader, CardTitle } from "@guppy-kit/ui";
+import { ArrowRight } from "lucide-react";
+
+import { getCategoryIcon } from "@/lib/icons";
 
 interface Props {
   params: Promise<{ family: string }>;
@@ -16,80 +19,49 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ToolFamilyPage({ params }: Props) {
   const { family } = await params;
+  const [categories, tools] = await Promise.all([getCategories(), getTools()]);
+  const cat = categories.find(c => c.id === family);
+  const familyTools = tools.filter(t => t.category === family || (t as any).family === family);
   
-  const categories = await getCategories();
-  const info = categories.find((c) => c.id === family);
-  
-  if (!info) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <p className="text-muted-foreground">Unknown tool family: {family}</p>
-      </div>
-    );
-  }
-
-  const tools = await getTools(family);
+  const Icon = getCategoryIcon(family);
 
   return (
-    <div className="px-8 py-8 max-w-4xl space-y-6">
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink render={<Link href="/dashboard" />}>Tools</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>{info.name}</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
-      <div className="flex items-center gap-4">
-        <span className="text-4xl">{info.icon}</span>
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">{info.name}</h1>
-          <p className="text-sm text-muted-foreground">{info.description}</p>
+    <div className="p-6 max-w-5xl mx-auto space-y-8">
+      {/* Hero */}
+      <div className="space-y-2">
+        <div className="flex items-center gap-3">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand/10">
+            <Icon className="h-8 w-8 text-brand" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold capitalize">{family.replace(/-/g, " ")}</h1>
+            <p className="text-sm text-muted-foreground">{familyTools.length} tools</p>
+          </div>
         </div>
+        {cat?.description && <p className="text-muted-foreground">{cat.description}</p>}
       </div>
-
-      {tools.length === 0 ? (
-        <div className="rounded-xl border border-border bg-card p-8 text-center text-muted-foreground">
-          No tools registered in this category yet.
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {tools.map((tool) => (
-            <Link
-              key={tool.name}
-              href={`/tools/${family}/${tool.name}`}
-              id={`tool-link-${tool.name}`}
-              aria-label={`Open ${tool.name.replace(/-/g, ' ')}`}
-              className="group flex items-start gap-4 rounded-xl border border-border bg-card p-5 transition-all hover:border-foreground/20 hover:shadow-sm hover:-translate-y-0.5"
-            >
-              <div
-                className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xl bg-brand/10"
-              >
-                {tool.icon || "🛠️"}
-              </div>
-              <div className="flex-1">
-                <p className="font-semibold text-sm capitalize">{tool.name.replace(/-/g, ' ')}</p>
-                <p className="text-xs text-muted-foreground mt-0.5 mb-2">{tool.description}</p>
+      {/* Tools grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {familyTools.map(tool => (
+          <Link key={tool.name} href={`/tools/${family}/${tool.name}`}>
+            <Card className="h-full transition-all hover:border-foreground/20 hover:shadow-sm hover:-translate-y-0.5">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm capitalize">{tool.name.replace(/-/g, " ")}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-muted-foreground line-clamp-2">{tool.description}</p>
                 {tool.tags && tool.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
-                    {tool.tags.slice(0, 3).map(tag => (
-                      <Badge key={tag} variant="secondary" className="text-[10px] px-1.5 py-0">
-                        {tag}
-                      </Badge>
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    {tool.tags.slice(0, 3).map((tag: string) => (
+                      <Badge key={tag} variant="outline" className="text-[10px]">{tag}</Badge>
                     ))}
                   </div>
                 )}
-              </div>
-              <svg className="ml-auto mt-1 h-4 w-4 shrink-0 text-muted-foreground/50 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </Link>
-          ))}
-        </div>
-      )}
+              </CardContent>
+            </Card>
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }

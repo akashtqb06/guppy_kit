@@ -2,7 +2,6 @@
 
 /// <reference types="node" />
 import { useCallback, useState, useEffect, useRef } from "react";
-// @ts-ignore
 import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from "react-resizable-panels";
 import { ToolInput } from "./ToolInput";
 import { ToolOutput } from "./ToolOutput";
@@ -11,6 +10,7 @@ import { Button } from "../ui/button";
 
 import { Alert, AlertDescription } from "../ui/alert";
 import { API_BASE } from "../../lib/constants";
+import { PenLine, Layers, RotateCcw, Loader2, CheckCircle2, XCircle } from "lucide-react";
 
 export type ToolLayout = "split" | "single" | "canvas";
 
@@ -115,16 +115,31 @@ export function ToolWorkspace({
 
   let executionStatusNode = null;
   if (isExecuting) {
-    executionStatusNode = <span className="ml-auto text-xs text-muted-foreground">⏳ Running...</span>;
+    executionStatusNode = (
+      <span className="ml-auto flex items-center gap-1.5 text-xs text-muted-foreground">
+        <Loader2 className="h-3 w-3 animate-spin" />
+        Running…
+      </span>
+    );
   } else if (error) {
-    executionStatusNode = <span className="ml-auto text-xs text-red-500">❌ Failed</span>;
+    executionStatusNode = (
+      <span className="ml-auto flex items-center gap-1.5 text-xs text-destructive">
+        <XCircle className="h-3 w-3" />
+        Failed
+      </span>
+    );
   } else if (result && result.status === "completed") {
-    executionStatusNode = <span className="ml-auto text-xs text-green-600">✅ {result.duration_ms.toFixed(0)}ms</span>;
+    executionStatusNode = (
+      <span className="ml-auto flex items-center gap-1.5 text-xs text-emerald-600">
+        <CheckCircle2 className="h-3 w-3" />
+        {result.duration_ms.toFixed(0)}ms
+      </span>
+    );
   }
 
   return (
     <div id={`tool-workspace-${toolName}`} className="flex h-full flex-col overflow-hidden">
-      {/* Toolbar */}
+      {/* Main toolbar */}
       <ToolToolbar
         toolName={toolName}
         isExecuting={isExecuting}
@@ -135,88 +150,94 @@ export function ToolWorkspace({
         onExecute={execute}
       />
 
-      {/* Panels */}
+      {/* Split panels */}
       {layout === "split" ? (
-        <PanelGroup direction="horizontal" className="flex-1 overflow-hidden">
-          <Panel defaultSize={45} minSize={25} className="flex flex-col overflow-hidden">
-            <div className="flex h-9 shrink-0 items-center justify-between border-b border-border px-4">
-              <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Input
-              </span>
-              <Button variant="ghost" size="sm" onClick={() => setInputValues({})} className="ml-auto h-7 text-xs">
-                Clear
-              </Button>
+        <PanelGroup orientation="horizontal" className="flex-1 overflow-hidden">
+          {/* Input Panel */}
+          <Panel defaultSize={45} minSize={20} className="flex flex-col overflow-hidden">
+            <div className="flex h-9 shrink-0 items-center justify-between border-b border-border bg-muted/30 px-3">
+              <div className="flex items-center gap-2">
+                <PenLine className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Input</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost" size="sm"
+                  onClick={() => setInputValues({})}
+                  className="h-6 px-2 text-[11px] text-muted-foreground gap-1"
+                >
+                  <RotateCcw className="h-3 w-3" />
+                  Clear
+                </Button>
+              </div>
             </div>
             <div className="flex-1 overflow-auto p-4">
               {customInput ?? (
-                <ToolInput
-                  toolName={toolName}
-                  values={inputValues}
-                  onChange={setInputValues}
-                />
+                <ToolInput toolName={toolName} values={inputValues} onChange={setInputValues} />
               )}
             </div>
           </Panel>
-          <PanelResizeHandle className="w-1.5 bg-border hover:bg-brand/60 transition-colors cursor-col-resize" />
-          <Panel defaultSize={55} minSize={25} className="flex flex-col overflow-hidden">
-            <div className="flex h-9 shrink-0 items-center border-b border-border px-4">
-              <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Output
-              </span>
+
+          {/* Resize handle */}
+          <PanelResizeHandle className="w-px bg-border hover:bg-brand/50 hover:w-[3px] transition-all cursor-col-resize" />
+
+          {/* Output Panel */}
+          <Panel defaultSize={55} minSize={20} className="flex flex-col overflow-hidden">
+            <div className="flex h-9 shrink-0 items-center justify-between border-b border-border bg-muted/30 px-3">
+              <div className="flex items-center gap-2">
+                <Layers className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Output</span>
+              </div>
               {executionStatusNode}
             </div>
             <div className="flex-1 overflow-auto p-4">
               {error ? (
                 <Alert variant="destructive">
+                  <XCircle className="h-4 w-4" />
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               ) : customOutput ? (
                 customOutput
               ) : (
-                <ToolOutput output={outputValue} isLoading={isExecuting} artifactType={schema?.output_artifact_type} />
+                <ToolOutput
+                  output={outputValue}
+                  isLoading={isExecuting}
+                  artifactType={schema?.output_artifact_type}
+                />
               )}
             </div>
           </Panel>
         </PanelGroup>
       ) : (
-        <div className="flex flex-1 overflow-hidden flex-col">
-          {/* Input panel */}
-          <div className="flex flex-col overflow-hidden border-border w-full border-b">
-            <div className="flex h-9 shrink-0 items-center justify-between border-b border-border px-4">
-              <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Input
-              </span>
-              <Button variant="ghost" size="sm" onClick={() => setInputValues({})} className="ml-auto h-7 text-xs">
+        // Single column layout (mobile)
+        <div className="flex flex-1 flex-col overflow-auto divide-y divide-border">
+          <div className="flex flex-col">
+            <div className="flex h-9 shrink-0 items-center justify-between border-b border-border bg-muted/30 px-3">
+              <div className="flex items-center gap-2">
+                <PenLine className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Input</span>
+              </div>
+              <Button variant="ghost" size="sm" onClick={() => setInputValues({})} className="h-6 px-2 text-[11px] gap-1">
+                <RotateCcw className="h-3 w-3" />
                 Clear
               </Button>
             </div>
-            <div className="flex-1 overflow-auto p-4">
-              {customInput ?? (
-                <ToolInput
-                  toolName={toolName}
-                  values={inputValues}
-                  onChange={setInputValues}
-                />
-              )}
+            <div className="p-4">
+              {customInput ?? <ToolInput toolName={toolName} values={inputValues} onChange={setInputValues} />}
             </div>
           </div>
-
-          {/* Output panel */}
-          <div className="flex flex-col overflow-hidden w-full">
-            <div className="flex h-9 shrink-0 items-center border-b border-border px-4">
-              <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Output
-              </span>
+          <div className="flex flex-col">
+            <div className="flex h-9 shrink-0 items-center justify-between border-b border-border bg-muted/30 px-3">
+              <div className="flex items-center gap-2">
+                <Layers className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Output</span>
+              </div>
               {executionStatusNode}
             </div>
-            <div className="flex-1 overflow-auto p-4">
+            <div className="p-4">
               {error ? (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              ) : customOutput ? (
-                customOutput
-              ) : (
+                <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>
+              ) : customOutput ? customOutput : (
                 <ToolOutput output={outputValue} isLoading={isExecuting} artifactType={schema?.output_artifact_type} />
               )}
             </div>

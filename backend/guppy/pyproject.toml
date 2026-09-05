@@ -15,7 +15,9 @@ dependencies = [
     "fastapi[standard]>=0.141.1",
     "httpx>=0.28.1",
     "itsdangerous>=2.2.0",
+    "markdown>=3.10.3",
     "mcp>=2.1.1",
+    "openpyxl>=3.1.5",
     "pydantic>=2.13.5",
     "pydantic-settings>=2.15.0",
     "pypdf>=6.16.2",
@@ -23,8 +25,11 @@ dependencies = [
     "python-multipart>=0.0.32",
     "python-pptx>=1.0.2",
     "pyyaml>=6.0.3",
+    "qrcode>=8.2",
     "redis>=8.1.0",
+    "reportlab>=5.0.1",
     "sqlalchemy[asyncio]>=2.0.52",
+    "sqlparse>=0.6.0",
 ]
 
 [build-system]

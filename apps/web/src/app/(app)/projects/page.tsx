@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose, Input, Textarea, Card, CardHeader, CardTitle, CardContent, CardFooter, Badge, DialogTrigger } from "@guppy-kit/ui";
+import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose, Input, Textarea, Card, CardHeader, CardTitle, CardContent, CardFooter, Badge, DialogTrigger, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@guppy-kit/ui";
 import Link from "next/link";
+import { FolderOpen, Plus, MoreHorizontal, Trash2, ExternalLink } from "lucide-react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -11,6 +12,13 @@ interface Project {
   name: string;
   description: string;
   created_at: string;
+}
+
+function getRelativeTime(dateString: string) {
+  const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+  const date = new Date(dateString);
+  const diffDays = Math.round((date.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+  return rtf.format(diffDays, 'day');
 }
 
 export default function ProjectsPage() {
@@ -67,11 +75,18 @@ export default function ProjectsPage() {
   return (
     <div className="p-8 max-w-5xl mx-auto space-y-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight">Projects</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold tracking-tight">Projects</h1>
+          <Badge variant="secondary" className="rounded-full">{projects.length}</Badge>
+        </div>
+        
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogTrigger render={<Button className="bg-brand text-brand-foreground hover:bg-brand/90" />}>
-            New Project
-          </DialogTrigger>
+          <DialogTrigger render={
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              New Project
+            </Button>
+          } />
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Create New Project</DialogTitle>
@@ -86,19 +101,27 @@ export default function ProjectsPage() {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Description</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium">Description</label>
+                  <span className={`text-xs ${newDesc.length > 200 ? 'text-destructive' : 'text-muted-foreground'}`}>
+                    {newDesc.length}/200
+                  </span>
+                </div>
                 <Textarea 
                   value={newDesc} 
                   onChange={(e) => setNewDesc(e.target.value)} 
-                  placeholder="Brief description of the project" 
+                  placeholder="Brief description of the project"
+                  className={newDesc.length > 200 ? 'border-destructive' : ''}
                 />
               </div>
             </div>
             <DialogFooter>
-              <DialogClose render={<Button variant="outline" />}>
-                Cancel
-              </DialogClose>
-              <Button onClick={handleCreate} disabled={!newName.trim() || isCreating} className="bg-brand text-brand-foreground hover:bg-brand/90">
+              <DialogClose render={
+                <Button variant="outline">
+                  Cancel
+                </Button>
+              } />
+              <Button onClick={handleCreate} disabled={!newName.trim() || isCreating || newDesc.length > 200}>
                 {isCreating ? "Creating..." : "Create"}
               </Button>
             </DialogFooter>
@@ -116,36 +139,52 @@ export default function ProjectsPage() {
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-brand" />
         </div>
       ) : projects.length === 0 ? (
-        <div className="flex flex-col items-center justify-center p-16 text-center border border-border border-dashed rounded-xl">
-          <div className="mb-4 text-4xl">🗂️</div>
-          <h2 className="mb-2 text-xl font-semibold">No projects yet</h2>
-          <p className="mb-6 text-sm text-muted-foreground max-w-md">
-            Create your first project to organize your work.
-          </p>
-          <Button onClick={() => setIsOpen(true)} className="bg-brand text-brand-foreground hover:bg-brand/90">
-            Create Project
-          </Button>
+        <div className="flex flex-col items-center justify-center py-24 text-center">
+          <div className="h-16 w-16 rounded-2xl bg-muted flex items-center justify-center mb-4">
+            <FolderOpen className="h-8 w-8 text-muted-foreground" />
+          </div>
+          <h3 className="font-semibold mb-1">No projects yet</h3>
+          <p className="text-sm text-muted-foreground mb-4">Projects help you organize related tool executions</p>
+          <Button onClick={() => setIsOpen(true)}>Create your first project</Button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {projects.map((project) => (
             <Card key={project.id} className="flex flex-col hover:border-foreground/20 transition-colors">
               <CardHeader className="pb-3">
-                <div className="flex justify-between items-start">
-                  <CardTitle className="text-lg line-clamp-1" title={project.name}>{project.name}</CardTitle>
-                  <Badge variant="outline" className="text-[10px] whitespace-nowrap ml-2">
-                    {new Date(project.created_at).toLocaleDateString()}
-                  </Badge>
+                <div className="flex justify-between items-start gap-2">
+                  <CardTitle className="text-lg font-bold line-clamp-1" title={project.name}>{project.name}</CardTitle>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger render={
+                      <Button variant="ghost" size="icon" className="h-8 w-8 -mr-2">
+                        <MoreHorizontal className="h-4 w-4" />
+                        <span className="sr-only">Menu</span>
+                      </Button>
+                    } />
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem>Edit</DropdownMenuItem>
+                      <DropdownMenuItem className="text-destructive focus:bg-destructive/10 focus:text-destructive">
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </CardHeader>
               <CardContent className="flex-1">
                 <p className="text-sm text-muted-foreground line-clamp-2">
                   {project.description || "No description provided."}
                 </p>
+                <div className="mt-4 text-xs text-muted-foreground font-medium">
+                  Created {getRelativeTime(project.created_at)}
+                </div>
               </CardContent>
               <CardFooter>
                 <Link href={`/projects/${project.id}`} className="w-full">
-                  <Button variant="outline" size="sm" className="w-full">Open →</Button>
+                  <Button variant="outline" className="w-full justify-between">
+                    Open Project
+                    <ExternalLink className="h-4 w-4" />
+                  </Button>
                 </Link>
               </CardFooter>
             </Card>

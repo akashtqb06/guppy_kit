@@ -22,6 +22,9 @@ export * from "./components/ui/tooltip"
 export * from "./components/ui/file-upload"
 export * from "./components/ui/artifact-viewer"
 export * from "./components/ui/rich-text-editor"
+export { CodeEditor } from "./components/ui/code-editor"
+export type { CodeLanguage } from "./components/ui/code-editor"
+export { JsonEditor } from "./components/ui/json-editor"
 
 // Tool workspace components
 export * from "./components/tool/ToolWorkspace"

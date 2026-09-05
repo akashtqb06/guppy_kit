@@ -8,6 +8,7 @@ import type { CategorySummary } from "@/lib/api";
 import { GuppyLogo } from "@/components/GuppyLogo";
 import { LayoutDashboard, History, FolderClosed, Settings, LogOut, Package2, Wrench } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { getCategoryIcon } from "@/lib/icons";
 import {
   Sidebar,
   SidebarContent,
@@ -155,10 +156,11 @@ export function AppShell({
                   {categories.map((c) => {
                     const href = `/tools/${c.id}`;
                     const isActive = pathname.startsWith(href);
+                    const CatIcon = getCategoryIcon(c.id);
                     return (
                       <SidebarMenuItem key={c.id}>
                         <SidebarMenuButton isActive={isActive} tooltip={c.name} render={<Link href={href} className="flex items-center gap-2.5" />}>
-                          <span className="text-base"><Package2 className="h-4 w-4" /></span>
+                          <span className="text-base"><CatIcon className="h-4 w-4 shrink-0" /></span>
                           <span className="flex-1 group-data-[collapsible=icon]:hidden">{c.name}</span>
                         </SidebarMenuButton>
                       </SidebarMenuItem>

@@ -1,9 +1,11 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getCategories, getTools } from "@/lib/api";
-import { Button } from "@guppy-kit/ui";
+import { Button, Badge, Card, CardContent, CardHeader, CardTitle, CardDescription } from "@guppy-kit/ui";
+import { Zap, Database, FileText, BarChart3, Code2, Layers, Shield, Clock, ArrowRight } from "lucide-react";
 import { GuppyLogo } from "@/components/GuppyLogo";
 import { HeroSearch } from "@/components/HeroSearch";
+import { CategoryIcon } from "@/lib/icons";
 
 export const metadata: Metadata = {
   title: "Guppy Kit — Professional Digital Workbench",
@@ -19,7 +21,7 @@ export default async function LandingPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* ── Navigation ── */}
+      {/* 1. Navigation */}
       <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-lg">
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-6">
           <div className="flex items-center gap-2">
@@ -33,127 +35,169 @@ export default async function LandingPage() {
             >
               Sign in
             </Link>
-            <Link
-              href="/register"
-              id="nav-get-started"
-              className="rounded-lg px-4 py-1.5 text-sm font-semibold transition-all hover:opacity-90 bg-brand text-brand-foreground"
-            >
+            <Button render={<Link href="/register" id="nav-get-started" />} className="bg-brand text-brand-foreground hover:opacity-90">
               Get started free
-            </Link>
+            </Button>
           </div>
         </div>
       </nav>
 
-      {/* ── Hero ── */}
+      {/* 2. Hero Section */}
       <section className="relative overflow-hidden px-6 py-24 text-center">
-        {/* Gradient background */}
-        <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+        {/* Animated gradient background */}
+        <div className="pointer-events-none absolute inset-0 flex justify-center" aria-hidden="true">
           <div
-            className="absolute left-1/2 top-0 h-[600px] w-[800px] -translate-x-1/2 -translate-y-1/3 rounded-full opacity-15 bg-brand"
-            style={{ backgroundImage: "radial-gradient(ellipse, var(--color-brand) 0%, transparent 70%)" }}
+            className="absolute -top-1/2 h-[800px] w-[1000px] animate-pulse rounded-full opacity-20 bg-brand blur-3xl"
+            style={{ backgroundImage: "radial-gradient(circle, var(--color-brand) 0%, transparent 60%)" }}
           />
         </div>
-        <div className="relative mx-auto max-w-3xl">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-muted px-3 py-1 text-xs text-muted-foreground">
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-brand" />
-            40+ Professional Tools · Open Source
-          </div>
-          <h1 className="mb-5 text-5xl font-black tracking-tight sm:text-7xl">
-            The workbench for
-            <span className="block mt-1" style={{ color: 'var(--color-brand)' }}>modern builders.</span>
+        <div className="relative mx-auto max-w-4xl z-10">
+          <Badge variant="outline" className="mb-6 rounded-full border-border bg-muted/50 px-4 py-1.5 text-xs text-muted-foreground backdrop-blur-sm">
+            <span className="mr-2 inline-block h-2 w-2 rounded-full bg-brand animate-pulse" />
+            Guppy Kit 1.0 is now live
+          </Badge>
+          <h1 className="mb-6 text-6xl font-black tracking-tight sm:text-7xl">
+            Every tool you need,
+            <span className="block mt-2 text-brand" style={{ color: 'var(--color-brand)' }}>right here.</span>
           </h1>
-          <p className="mb-8 text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+          <p className="mb-10 text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
             40+ professional tools for data, documents, databases, and developer workflows. All in one place. No installs.
           </p>
-          <div className="mb-12 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href="/register"
-              className="rounded-lg px-6 py-3 text-base font-semibold transition-all hover:opacity-90 bg-brand text-brand-foreground"
-            >
-              Get started free
-            </Link>
-            <Link
-              href="/tools"
-              className="rounded-lg px-6 py-3 text-base font-semibold transition-all hover:bg-muted bg-background border border-border text-foreground"
-            >
-              Explore tools &rarr;
-            </Link>
+          <div className="mb-14 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Button render={<Link href="/register" />} size="lg" className="h-12 px-8 bg-brand text-brand-foreground hover:opacity-90 rounded-xl text-base w-full sm:w-auto">
+              Get started free <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+            <Button render={<Link href="/tools" />} size="lg" variant="outline" className="h-12 px-8 rounded-xl text-base w-full sm:w-auto bg-background/50 backdrop-blur">
+              Explore tools
+            </Button>
           </div>
 
           {/* Search bar */}
-          <HeroSearch tools={allTools} />
-
-          <div className="mt-6 flex flex-wrap justify-center gap-2 text-xs text-muted-foreground">
-            <span>Popular:</span>
-            {popularTools.map((t) => (
-              <Button
-                key={t.name}
-                variant="outline"
-                size="sm"
-                className="rounded-full px-2.5 py-0.5 capitalize"
-              >
-                {t.name.replace(/-/g, ' ')}
-              </Button>
-            ))}
-          </div>
-
-          <div className="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-4 text-left">
-            {[
-              { icon: "⚡", title: "Instant Results", desc: "No setup, no installs" },
-              { icon: "🔗", title: "Artifact Chaining", desc: "Tools feed into each other" },
-              { icon: "🔒", title: "Private by Default", desc: "Your data stays yours" },
-              { icon: "🛠️", title: "40+ Tools", desc: "Across 8 categories" },
-            ].map((f) => (
-              <div key={f.title} className="bg-muted/50 rounded-xl p-4">
-                <div className="text-2xl mb-2">{f.icon}</div>
-                <div className="font-semibold text-sm">{f.title}</div>
-                <div className="text-xs text-muted-foreground">{f.desc}</div>
-              </div>
-            ))}
+          <div className="max-w-2xl mx-auto backdrop-blur-md bg-background/30 p-1 rounded-2xl border border-border shadow-2xl">
+             <HeroSearch tools={allTools} />
           </div>
         </div>
       </section>
 
-      {/* ── Tool Families ── */}
-      <section className="px-6 py-16">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-10 text-center">
-            <h2 className="text-3xl font-bold tracking-tight">{categories.length} Tool Families</h2>
-            <p className="mt-2 text-muted-foreground">
-              Everything a data analyst, developer, or operations team needs — in one place.
-            </p>
+      {/* 3. Stats Strip */}
+      <section className="border-y border-border bg-muted/30">
+        <div className="mx-auto max-w-7xl px-6 py-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-border/50">
+            <div className="flex flex-col items-center justify-center">
+              <div className="text-4xl font-black text-foreground mb-2">40+</div>
+              <div className="text-sm text-muted-foreground font-medium flex items-center gap-2"><Zap className="h-4 w-4 text-brand" /> Tools</div>
+            </div>
+            <div className="flex flex-col items-center justify-center">
+              <div className="text-4xl font-black text-foreground mb-2">8</div>
+              <div className="text-sm text-muted-foreground font-medium flex items-center gap-2"><Layers className="h-4 w-4 text-brand" /> Categories</div>
+            </div>
+            <div className="flex flex-col items-center justify-center">
+              <div className="text-4xl font-black text-foreground mb-2">100%</div>
+              <div className="text-sm text-muted-foreground font-medium flex items-center gap-2"><Code2 className="h-4 w-4 text-brand" /> Open Source</div>
+            </div>
+            <div className="flex flex-col items-center justify-center">
+              <div className="text-4xl font-black text-foreground mb-2">Zero</div>
+              <div className="text-sm text-muted-foreground font-medium flex items-center gap-2"><Clock className="h-4 w-4 text-brand" /> Install</div>
+            </div>
           </div>
+        </div>
+      </section>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* 4. Feature Bento Grid */}
+      <section className="px-6 py-24">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-16 text-center max-w-3xl mx-auto">
+            <h2 className="text-4xl font-bold tracking-tight mb-4">Everything you need to ship faster</h2>
+            <p className="text-lg text-muted-foreground">A unified workspace that replaces dozens of single-purpose apps and disjointed scripts.</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card className="md:col-span-2 bg-gradient-to-br from-card to-muted/50 border-border/50 overflow-hidden group">
+              <CardContent className="p-8 h-full flex flex-col justify-between">
+                <div>
+                  <div className="h-12 w-12 rounded-xl bg-brand/10 flex items-center justify-center text-brand mb-6 group-hover:scale-110 transition-transform">
+                    <Zap className="h-6 w-6" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-3">Instant Execution</h3>
+                  <p className="text-muted-foreground">Run complex operations in milliseconds. No servers to provision, no dependencies to install. Just input your data and get results instantly.</p>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-gradient-to-br from-card to-muted/50 border-border/50 overflow-hidden group">
+              <CardContent className="p-8 h-full flex flex-col justify-between">
+                <div>
+                  <div className="h-12 w-12 rounded-xl bg-brand/10 flex items-center justify-center text-brand mb-6 group-hover:scale-110 transition-transform">
+                    <Shield className="h-6 w-6" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-3">Private & Secure</h3>
+                  <p className="text-muted-foreground">Your data never leaves your control. Local-first execution for sensitive workloads.</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-card to-muted/50 border-border/50 overflow-hidden group">
+              <CardContent className="p-8 h-full flex flex-col justify-between">
+                <div>
+                  <div className="h-12 w-12 rounded-xl bg-brand/10 flex items-center justify-center text-brand mb-6 group-hover:scale-110 transition-transform">
+                    <Database className="h-6 w-6" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-3">Data Tooling</h3>
+                  <p className="text-muted-foreground">Transform, query, and visualize data without writing boilerplate.</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="md:col-span-2 bg-gradient-to-br from-card to-muted/50 border-border/50 overflow-hidden group">
+              <CardContent className="p-8 h-full flex flex-col justify-between">
+                <div>
+                  <div className="h-12 w-12 rounded-xl bg-brand/10 flex items-center justify-center text-brand mb-6 group-hover:scale-110 transition-transform">
+                    <Layers className="h-6 w-6" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-3">Composable Artifacts</h3>
+                  <p className="text-muted-foreground">Tools aren't silos. The output of one tool seamlessly becomes the input for the next, creating powerful automated workflows.</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Category Showcase */}
+      <section className="px-6 py-24 bg-muted/20 border-y border-border">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <h2 className="text-3xl font-bold tracking-tight mb-2">Explore by Category</h2>
+              <p className="text-muted-foreground">Find exactly what you need from our extensive library.</p>
+            </div>
+            <Button variant="ghost" render={<Link href="/tools" />} className="shrink-0">
+              View all categories <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+          
+          <div className="flex overflow-x-auto pb-8 -mx-6 px-6 gap-4 snap-x snap-mandatory hide-scrollbar">
             {categories.map((family) => {
               const familyTools = allTools.filter((t) => t.category === family.id);
               return (
                 <Link
                   key={family.id}
                   href={`/tools/${family.id}`}
-                  id={`family-card-${family.id}`}
-                  className="group rounded-2xl border border-border bg-card p-6 transition-all duration-200 hover:border-transparent hover:shadow-lg hover:-translate-y-0.5"
+                  className="snap-start shrink-0 w-[280px] sm:w-[320px] group rounded-2xl border border-border bg-card p-6 transition-all duration-200 hover:border-brand/50 hover:shadow-md block relative overflow-hidden"
                 >
-                  <div className="h-10 w-10 rounded-lg bg-brand/10 flex items-center justify-center text-lg mb-3">
-                    {family.icon}
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-brand/5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500" />
+                  <div className="relative z-10">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="h-12 w-12 rounded-xl bg-muted flex items-center justify-center text-2xl group-hover:bg-brand group-hover:text-brand-foreground transition-colors">
+                        <CategoryIcon category={family.id} className="h-6 w-6" />
+                      </div>
+                      <Badge variant="secondary" className="font-mono">{familyTools.length} tools</Badge>
+                    </div>
+                    <h3 className="text-xl font-bold mb-2">{family.name}</h3>
+                    <p className="text-sm text-muted-foreground line-clamp-2">
+                      {family.description}
+                    </p>
                   </div>
-                  <h3 className="mb-1 font-semibold">{family.name}</h3>
-                  <p className="mb-4 text-xs text-muted-foreground leading-relaxed">
-                    {family.description}
-                  </p>
-                  <ul className="space-y-1">
-                    {familyTools.slice(0, 3).map((tool) => (
-                      <li key={tool.name} className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                        <span className="h-1 w-1 rounded-full bg-muted-foreground/50" />
-                        <span className="capitalize">{tool.name.replace(/-/g, ' ')}</span>
-                      </li>
-                    ))}
-                    {familyTools.length > 3 && (
-                      <li className="text-xs font-medium text-muted-foreground mt-2">
-                        + {familyTools.length - 3} more →
-                      </li>
-                    )}
-                  </ul>
                 </Link>
               );
             })}
@@ -161,92 +205,122 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* ── Popular Tools ── */}
-      <section className="px-6 py-16 bg-muted/30">
+      {/* 6. Popular Tools Grid */}
+      <section className="px-6 py-24">
         <div className="mx-auto max-w-7xl">
-          <div className="mb-10 text-center">
-            <h2 className="text-3xl font-bold tracking-tight">Popular Tools</h2>
-            <p className="mt-2 text-muted-foreground">Start with the most-used tools</p>
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl font-bold tracking-tight mb-4">Most Popular Tools</h2>
+            <p className="text-muted-foreground">The tools our community relies on every day.</p>
           </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {popularTools.map((tool) => (
               <Link
                 key={tool.name}
                 href={`/tools/${tool.category}/${tool.name}`}
-                className="flex items-center gap-4 rounded-xl border border-border bg-card p-4 transition-all hover:border-foreground/20 hover:shadow-sm group"
+                className="group block"
               >
-                <div className="text-xl shrink-0">{tool.icon || "🛠️"}</div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold capitalize truncate">{tool.name.replace(/-/g, ' ')} <span className="font-normal text-muted-foreground ml-1">· {tool.category}</span></p>
-                  <p className="text-xs text-muted-foreground line-clamp-1">{tool.description}</p>
-                </div>
-                <svg className="ml-auto h-4 w-4 text-muted-foreground opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
+                <Card className="h-full transition-all hover:border-brand/50 hover:shadow-md overflow-hidden bg-card/50 backdrop-blur-sm">
+                  <CardHeader className="pb-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="text-3xl"><CategoryIcon category={tool.category ?? (tool as any).family ?? "utilities"} className="h-6 w-6" /></div>
+                      <Badge variant="outline" className="bg-background capitalize">{tool.category.replace(/-/g, ' ')}</Badge>
+                    </div>
+                    <CardTitle className="capitalize text-lg">{tool.name.replace(/-/g, ' ')}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{tool.description}</p>
+                    <div className="flex items-center text-sm font-medium text-brand opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0 transform duration-200">
+                      Try this tool <ArrowRight className="ml-1 h-4 w-4" />
+                    </div>
+                  </CardContent>
+                </Card>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Feature highlights ── */}
-      <section className="px-6 py-20">
+      {/* 7. How It Works */}
+      <section className="px-6 py-24 bg-muted/30">
         <div className="mx-auto max-w-7xl">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-            {[
-              {
-                icon: "🔗",
-                title: "Tools Compose",
-                description:
-                  "Every tool output is a typed artifact. Pass it directly to the next tool — no downloads, no manual file management.",
-              },
-              {
-                icon: "🔌",
-                title: "REST API + MCP",
-                description:
-                  "Every tool has a REST endpoint and an MCP interface — out of the box, no extra code required.",
-              },
-              {
-                icon: "📦",
-                title: "Open Source",
-                description:
-                  "MIT licensed. Self-host it, extend it, add your own tools, and keep full control of your data.",
-              },
-            ].map((feature) => (
-              <div key={feature.title} className="text-center">
-                <div className="mb-4 text-4xl">{feature.icon}</div>
-                <h3 className="mb-2 text-lg font-semibold">{feature.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {feature.description}
-                </p>
+          <div className="mb-16 text-center">
+            <h2 className="text-3xl font-bold tracking-tight mb-4">How Guppy Kit Works</h2>
+            <p className="text-muted-foreground">A unified pipeline from input to insight.</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
+            {/* Connecting line for desktop */}
+            <div className="hidden md:block absolute top-12 left-[15%] right-[15%] h-[2px] bg-border border-dashed border-b-2" />
+            
+            <div className="relative text-center z-10">
+              <div className="h-24 w-24 mx-auto bg-background border-4 border-muted rounded-full flex items-center justify-center mb-6 shadow-sm">
+                <FileText className="h-10 w-10 text-brand" />
               </div>
-            ))}
+              <h3 className="text-xl font-bold mb-2">1. Select a Tool</h3>
+              <p className="text-muted-foreground text-sm">Choose from 40+ specialized tools across categories like data, documents, and dev.</p>
+            </div>
+            
+            <div className="relative text-center z-10">
+              <div className="h-24 w-24 mx-auto bg-background border-4 border-muted rounded-full flex items-center justify-center mb-6 shadow-sm">
+                <Zap className="h-10 w-10 text-brand" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">2. Execute</h3>
+              <p className="text-muted-foreground text-sm">Provide inputs and run instantly. Processing happens securely and fast.</p>
+            </div>
+            
+            <div className="relative text-center z-10">
+              <div className="h-24 w-24 mx-auto bg-background border-4 border-muted rounded-full flex items-center justify-center mb-6 shadow-sm">
+                <BarChart3 className="h-10 w-10 text-brand" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">3. Get Artifacts</h3>
+              <p className="text-muted-foreground text-sm">Receive typed, reusable artifacts you can export or pipe into the next tool.</p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── CTA ── */}
-      <section className="px-6 py-20 text-center">
-        <div className="mx-auto max-w-2xl">
-          <h2 className="mb-4 text-3xl font-bold tracking-tight">
-            Ready to get started?
-          </h2>
-          <p className="mb-8 text-muted-foreground">
-            Free to use. Open source. No credit card required.
-          </p>
-          <Link
-            href="/register"
-            id="cta-get-started"
-            className="inline-flex items-center gap-2 rounded-xl px-8 py-3.5 text-base font-semibold transition-all hover:opacity-90 hover:scale-105 bg-brand text-brand-foreground"
-          >
-            Start building for free →
-          </Link>
+      {/* 8. CTA Banner */}
+      <section className="px-6 py-24">
+        <div className="mx-auto max-w-5xl">
+          <div className="relative rounded-3xl overflow-hidden bg-brand text-brand-foreground px-8 py-16 text-center">
+            <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at center, white 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
+            <div className="relative z-10">
+              <h2 className="text-4xl md:text-5xl font-black mb-6">Ready to upgrade your workflow?</h2>
+              <p className="text-brand-foreground/80 text-lg mb-10 max-w-2xl mx-auto">
+                Join thousands of developers and data professionals building faster with Guppy Kit.
+              </p>
+              <div className="flex flex-col sm:flex-row justify-center gap-4">
+                <Button render={<Link href="/register" />} size="lg" variant="secondary" className="h-14 px-8 rounded-xl text-base font-bold w-full sm:w-auto">
+                  Start building for free
+                </Button>
+                <p className="mt-4 sm:hidden text-sm opacity-80">No credit card required.</p>
+              </div>
+              <p className="hidden sm:block mt-6 text-sm opacity-80">No credit card required. Open source.</p>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* ── Footer ── */}
-      <footer className="border-t border-border py-8 px-6 text-center text-xs text-muted-foreground">
-        <p>Guppy Kit · Open Source · MIT License</p>
+      {/* 9. Footer */}
+      <footer className="border-t border-border bg-background">
+        <div className="mx-auto max-w-7xl px-6 py-12">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="flex items-center gap-2">
+              <GuppyLogo />
+              <span className="font-bold">Guppy Kit</span>
+            </div>
+            <div className="flex gap-6 text-sm text-muted-foreground">
+              <Link href="/tools" className="hover:text-foreground transition-colors">Tools</Link>
+              <a href="https://github.com/guppy-kit" target="_blank" rel="noreferrer" className="hover:text-foreground transition-colors">GitHub</a>
+              <Link href="/login" className="hover:text-foreground transition-colors">Sign in</Link>
+            </div>
+          </div>
+          <div className="mt-8 pt-8 border-t border-border/50 text-center md:text-left text-xs text-muted-foreground flex flex-col md:flex-row justify-between">
+            <p>© {new Date().getFullYear()} Guppy Kit. Open Source.</p>
+            <p className="mt-2 md:mt-0">MIT License</p>
+          </div>
+        </div>
       </footer>
     </div>
   );

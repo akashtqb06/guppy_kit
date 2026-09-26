@@ -147,7 +147,7 @@ class PdfGeneratorTool(BaseTool):
         from reportlab.lib import colors
         from reportlab.lib.pagesizes import A3, A4, LEGAL, LETTER
         from reportlab.lib.pagesizes import landscape as rl_landscape
-        from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+        from reportlab.lib.styles import ParagraphStyle
         from reportlab.lib.units import mm
         from reportlab.platypus import HRFlowable, Paragraph, SimpleDocTemplate, Spacer
 

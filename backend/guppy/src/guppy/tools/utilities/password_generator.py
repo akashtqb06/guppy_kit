@@ -23,6 +23,7 @@ class PasswordGeneratorInput(BaseModel):
 class PasswordGeneratorOutput(BaseModel):
     passwords: list[str]
     length: int
+    charset_size: int
     entropy_bits: float
 
 
@@ -79,5 +80,8 @@ class PasswordGeneratorTool(BaseTool[PasswordGeneratorInput, NoConfig, PasswordG
             passwords.append(pwd)
 
         return PasswordGeneratorOutput(
-            passwords=passwords, length=input.length, entropy_bits=entropy
+            passwords=passwords,
+            length=input.length,
+            charset_size=charset_size,
+            entropy_bits=entropy,
         )

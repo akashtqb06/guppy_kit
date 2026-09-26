@@ -1,0 +1,14 @@
+name: string-utilities
+version: "1.0.0"
+category: utilities
+description: "Common string operations: trim, reverse, sort lines, extract emails/URLs, and more."
+tags:
+  - string
+  - text
+  - utilities
+  - trim
+  - sort
+  - extract
+icon: text-cursor
+input_artifact_types: []
+output_artifact_type: text

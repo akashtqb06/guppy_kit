@@ -1,0 +1,13 @@
+name: scatter-chart
+version: "1.0.0"
+category: visualization
+description: "Generate an SVG scatter plot from x/y data points."
+tags:
+  - scatter
+  - chart
+  - plot
+  - visualization
+  - svg
+icon: scatter-chart
+input_artifact_types: []
+output_artifact_type: svg

@@ -35,7 +35,7 @@ export default async function LandingPage() {
             >
               Sign in
             </Link>
-            <Button render={<Link href="/register" id="nav-get-started" />} className="bg-brand text-brand-foreground hover:opacity-90">
+            <Button nativeButton={false} render={<Link href="/register" id="nav-get-started" />} className="bg-brand text-brand-foreground hover:opacity-90">
               Get started free
             </Button>
           </div>
@@ -43,9 +43,9 @@ export default async function LandingPage() {
       </nav>
 
       {/* 2. Hero Section */}
-      <section className="relative overflow-hidden px-6 py-24 text-center">
-        {/* Animated gradient background */}
-        <div className="pointer-events-none absolute inset-0 flex justify-center" aria-hidden="true">
+      <section className="relative px-6 py-24 text-center">
+        {/* Animated gradient background — overflow-hidden here keeps the orb inside */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden flex justify-center" aria-hidden="true">
           <div
             className="absolute -top-1/2 h-[800px] w-[1000px] animate-pulse rounded-full opacity-20 bg-brand blur-3xl"
             style={{ backgroundImage: "radial-gradient(circle, var(--color-brand) 0%, transparent 60%)" }}
@@ -64,16 +64,16 @@ export default async function LandingPage() {
             40+ professional tools for data, documents, databases, and developer workflows. All in one place. No installs.
           </p>
           <div className="mb-14 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button render={<Link href="/register" />} size="lg" className="h-12 px-8 bg-brand text-brand-foreground hover:opacity-90 rounded-xl text-base w-full sm:w-auto">
+            <Button nativeButton={false} render={<Link href="/register" />} size="lg" className="h-12 px-8 bg-brand text-brand-foreground hover:opacity-90 rounded-xl text-base w-full sm:w-auto">
               Get started free <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
-            <Button render={<Link href="/tools" />} size="lg" variant="outline" className="h-12 px-8 rounded-xl text-base w-full sm:w-auto bg-background/50 backdrop-blur">
+            <Button nativeButton={false} render={<Link href="/tools" />} size="lg" variant="outline" className="h-12 px-8 rounded-xl text-base w-full sm:w-auto bg-background/50 backdrop-blur">
               Explore tools
             </Button>
           </div>
 
           {/* Search bar */}
-          <div className="max-w-2xl mx-auto backdrop-blur-md bg-background/30 p-1 rounded-2xl border border-border shadow-2xl">
+          <div className="max-w-2xl mx-auto">
              <HeroSearch tools={allTools} />
           </div>
         </div>
@@ -171,7 +171,7 @@ export default async function LandingPage() {
               <h2 className="text-3xl font-bold tracking-tight mb-2">Explore by Category</h2>
               <p className="text-muted-foreground">Find exactly what you need from our extensive library.</p>
             </div>
-            <Button variant="ghost" render={<Link href="/tools" />} className="shrink-0">
+            <Button nativeButton={false} variant="ghost" render={<Link href="/tools" />} className="shrink-0">
               View all categories <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
@@ -223,7 +223,7 @@ export default async function LandingPage() {
                 <Card className="h-full transition-all hover:border-brand/50 hover:shadow-md overflow-hidden bg-card/50 backdrop-blur-sm">
                   <CardHeader className="pb-4">
                     <div className="flex justify-between items-start mb-2">
-                      <div className="text-3xl"><CategoryIcon category={tool.category ?? (tool as any).family ?? "utilities"} className="h-6 w-6" /></div>
+                      <div className="text-3xl"><CategoryIcon category={tool.category || "utilities"} className="h-6 w-6" /></div>
                       <Badge variant="outline" className="bg-background capitalize">{tool.category.replace(/-/g, ' ')}</Badge>
                     </div>
                     <CardTitle className="capitalize text-lg">{tool.name.replace(/-/g, ' ')}</CardTitle>
@@ -291,7 +291,7 @@ export default async function LandingPage() {
                 Join thousands of developers and data professionals building faster with Guppy Kit.
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
-                <Button render={<Link href="/register" />} size="lg" variant="secondary" className="h-14 px-8 rounded-xl text-base font-bold w-full sm:w-auto">
+                <Button nativeButton={false} render={<Link href="/register" />} size="lg" variant="secondary" className="h-14 px-8 rounded-xl text-base font-bold w-full sm:w-auto">
                   Start building for free
                 </Button>
                 <p className="mt-4 sm:hidden text-sm opacity-80">No credit card required.</p>

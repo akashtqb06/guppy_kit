@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import type { CategorySummary } from "@/lib/api";
 import { GuppyLogo } from "@/components/GuppyLogo";
-import { LayoutDashboard, History, FolderClosed, Settings, LogOut, Package2, Wrench } from "lucide-react";
+import { LayoutDashboard, History, FolderClosed, Settings, LogOut, Wrench } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { getCategoryIcon } from "@/lib/icons";
 import {
@@ -30,7 +30,7 @@ import {
   SidebarGroupLabel,
   SidebarGroupContent,
 } from "@guppy-kit/ui";
-import { CommandPalette } from "@/components/CommandPalette";
+import { CommandPalette, Tool } from "@/components/CommandPalette";
 import { Search } from "lucide-react";
 
 export function AppShell({
@@ -45,7 +45,7 @@ export function AppShell({
   const router = useRouter();
   const [recentExecCount, setRecentExecCount] = useState(0);
   const [commandOpen, setCommandOpen] = useState(false);
-  const [tools, setTools] = useState<any[]>([]);
+  const [tools, setTools] = useState<Tool[]>([]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -125,6 +125,7 @@ export function AppShell({
                     { href: "/tools", label: "All Tools", icon: <Wrench className="h-4 w-4" /> },
                     { href: "/projects", label: "Projects", icon: <FolderClosed className="h-4 w-4" /> },
                     { href: "/history", label: "History", icon: <History className="h-4 w-4" /> },
+                    { href: "/settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
                     ...(user?.is_admin ? [{ href: "/admin/users", label: "Admin", icon: <Settings className="h-4 w-4" /> }] : []),
                   ].map((item) => {
                     const isActive =

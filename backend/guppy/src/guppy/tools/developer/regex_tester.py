@@ -18,6 +18,8 @@ class RegexTesterOutput(BaseModel):
     matches: list[dict]
     match_count: int
     is_valid_pattern: bool
+    named_groups: dict[str, str] = Field(default_factory=dict)
+    full_match: bool = False
     error: str | None = None
 
 
@@ -47,17 +49,29 @@ class RegexTesterTool(BaseTool[RegexTesterInput, NoConfig, RegexTesterOutput]):
 
             compiled = re.compile(input.pattern, re_flags)
             matches = []
+            named_groups = {}
             for match in compiled.finditer(input.text):
-                matches.append(
-                    {
-                        "start": match.start(),
-                        "end": match.end(),
-                        "value": match.group(),
-                        "groups": match.groups(),
-                    }
-                )
+                match_dict = {
+                    "start": match.start(),
+                    "end": match.end(),
+                    "value": match.group(),
+                    "groups": match.groups(),
+                    "named_groups": match.groupdict(),
+                }
+                matches.append(match_dict)
+                if match.groupdict():
+                    named_groups.update(match.groupdict())
+
+            full_match = False
+            if compiled.fullmatch(input.text):
+                full_match = True
+
             return RegexTesterOutput(
-                matches=matches, match_count=len(matches), is_valid_pattern=True
+                matches=matches,
+                match_count=len(matches),
+                is_valid_pattern=True,
+                named_groups=named_groups,
+                full_match=full_match,
             )
         except Exception as exc:
             return RegexTesterOutput(

@@ -6,6 +6,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@gupp
 import { CategoryIcon } from "@/lib/icons";
 
 import { DashboardStats } from "./DashboardStats";
+import { DashboardGreeting, DashboardQuickActions, DashboardRecentExecutions } from "./DashboardClient";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
@@ -18,12 +19,9 @@ export default async function DashboardPage() {
   return (
     <div className="px-8 py-8 max-w-6xl mx-auto space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Welcome back. What are you working on today?
-        </p>
-      </div>
+      <DashboardGreeting />
+
+      <DashboardQuickActions />
 
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Left column (Main) */}
@@ -33,7 +31,7 @@ export default async function DashboardPage() {
           {/* Quick access */}
           <section>
             <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-              Quick Start
+              Quick Start Tools
             </h2>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               {recentTools.map((tool) => (
@@ -51,6 +49,8 @@ export default async function DashboardPage() {
               ))}
             </div>
           </section>
+
+          <DashboardRecentExecutions />
         </div>
 
         {/* Right column (Sidebar) */}

@@ -1,0 +1,11 @@
+name: html-to-pdf
+version: "1.0.0"
+category: documents
+description: "Convert HTML content to a PDF."
+tags:
+  - pdf
+  - html
+  - convert
+icon: file-code
+input_artifact_types: []
+output_artifact_type: pdf

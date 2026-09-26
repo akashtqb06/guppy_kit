@@ -9,7 +9,7 @@ import {
 } from "@guppy-kit/ui"
 import { LayoutDashboard, Wrench, FolderClosed, History, Package2, ArrowRight } from "lucide-react"
 
-interface Tool {
+export interface Tool {
   name: string
   category: string
   description: string
@@ -48,7 +48,7 @@ export function CommandPalette({ open, onOpenChange, tools = [] }: CommandPalett
           </div>
           <Command.List className="max-h-96 overflow-y-auto overflow-x-hidden p-2">
             <Command.Empty className="py-6 text-center text-sm text-muted-foreground">
-              No results found for "{search}"
+              No results found for &quot;{search}&quot;
             </Command.Empty>
 
             <Command.Group heading="Navigation">

@@ -66,15 +66,61 @@ export function ToolWorkspace({
     fetchSchema();
   }, [toolName]);
 
+  /**
+   * Coerce form string values to proper JSON types based on the schema.
+   * All ToolInput fields are stored as strings; the API expects typed values.
+   * - array / object fields: JSON.parse the string
+   * - number / integer: parseFloat / parseInt
+   * - boolean: 'true' / '1' → true
+   */
+  function coerceInputForSchema(
+    values: Record<string, unknown>,
+    inputSchema: Record<string, unknown> | undefined,
+  ): Record<string, unknown> {
+    const properties = (inputSchema?.properties ?? {}) as Record<string, { type?: string; items?: unknown }>;
+    const result: Record<string, unknown> = {};
+    for (const [key, val] of Object.entries(values)) {
+      const fieldDef = properties[key];
+      const fType = fieldDef?.type;
+      if (typeof val === "string" && fType) {
+        if (fType === "array" || fType === "object") {
+          try { result[key] = JSON.parse(val); } catch { result[key] = val; }
+        } else if (fType === "integer") {
+          const n = parseInt(val, 10);
+          result[key] = isNaN(n) ? val : n;
+        } else if (fType === "number") {
+          const n = parseFloat(val);
+          result[key] = isNaN(n) ? val : n;
+        } else if (fType === "boolean") {
+          result[key] = val === "true" || val === "1" || val === "yes";
+        } else {
+          result[key] = val;
+        }
+      } else if (typeof val === "string" && !fieldDef) {
+        // Unknown field — try to auto-detect JSON arrays/objects
+        const trimmed = val.trim();
+        if ((trimmed.startsWith("[") || trimmed.startsWith("{")) && trimmed.length > 1) {
+          try { result[key] = JSON.parse(trimmed); } catch { result[key] = val; }
+        } else {
+          result[key] = val;
+        }
+      } else {
+        result[key] = val;
+      }
+    }
+    return result;
+  }
+
   const execute = useCallback(async () => {
     setError(null);
     setIsExecuting(true);
     try {
+      const coercedInput = coerceInputForSchema(inputValues, schema?.input_schema);
       const res = await fetch(`${API_BASE}/api/v1/tools/${toolName}/execute`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ input: inputValues }),
+        body: JSON.stringify({ input: coercedInput }),
       });
       const data = await res.json() as unknown;
       if (!res.ok) {
@@ -92,7 +138,7 @@ export function ToolWorkspace({
     } finally {
       setIsExecuting(false);
     }
-  }, [toolName, inputValues, onSuccess, onError]);
+  }, [toolName, inputValues, schema, onSuccess, onError]);
 
   const handleRunRef = useRef(execute);
   useEffect(() => {
@@ -161,6 +207,9 @@ export function ToolWorkspace({
                 <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Input</span>
               </div>
               <div className="flex items-center gap-1">
+                <kbd className="hidden sm:inline-flex items-center rounded border border-border px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground ml-auto mr-1">
+                  Ctrl+↵
+                </kbd>
                 <Button
                   variant="ghost" size="sm"
                   onClick={() => setInputValues({})}
@@ -217,10 +266,15 @@ export function ToolWorkspace({
                 <PenLine className="h-3.5 w-3.5 text-muted-foreground" />
                 <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Input</span>
               </div>
-              <Button variant="ghost" size="sm" onClick={() => setInputValues({})} className="h-6 px-2 text-[11px] gap-1">
-                <RotateCcw className="h-3 w-3" />
-                Clear
-              </Button>
+              <div className="flex items-center gap-1">
+                <kbd className="hidden sm:inline-flex items-center rounded border border-border px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground ml-auto mr-1">
+                  Ctrl+↵
+                </kbd>
+                <Button variant="ghost" size="sm" onClick={() => setInputValues({})} className="h-6 px-2 text-[11px] gap-1">
+                  <RotateCcw className="h-3 w-3" />
+                  Clear
+                </Button>
+              </div>
             </div>
             <div className="p-4">
               {customInput ?? <ToolInput toolName={toolName} values={inputValues} onChange={setInputValues} />}

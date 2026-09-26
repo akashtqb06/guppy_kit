@@ -13,6 +13,7 @@ import { RichTextEditor } from "../ui/rich-text-editor";
 import { CodeEditor } from "../ui/code-editor";
 import { JsonEditor } from "../ui/json-editor";
 import { Button } from "../ui/button";
+import { FlaskConical } from "lucide-react";
 
 interface ToolInputField {
   name: string;
@@ -24,6 +25,86 @@ interface ToolInputField {
   minimum?: number;
   maximum?: number;
   items?: { type: string };
+}
+
+const TOOL_SAMPLES: Record<string, Record<string, unknown>> = {
+  'bar-chart': {
+    labels: JSON.stringify(['Mon', 'Tue', 'Wed', 'Thu', 'Fri']),
+    values: JSON.stringify([42, 68, 55, 83, 91]),
+    title: 'Weekly Activity',
+  },
+  'line-chart': {
+    labels: JSON.stringify(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']),
+    values: JSON.stringify([120, 145, 98, 167, 201, 185]),
+    title: 'Monthly Growth',
+  },
+  'pie-chart': {
+    labels: JSON.stringify(['JavaScript', 'Python', 'TypeScript', 'Rust', 'Go']),
+    values: JSON.stringify([35, 28, 20, 10, 7]),
+    title: 'Language Usage',
+  },
+  'scatter-chart': {
+    points: JSON.stringify([
+      {x: 1, y: 4, label: 'A'}, {x: 2, y: 7, label: 'B'},
+      {x: 3, y: 3, label: 'C'}, {x: 4, y: 9, label: 'D'},
+      {x: 5, y: 6, label: 'E'}, {x: 6, y: 8, label: 'F'},
+    ]),
+    title: 'Sample Scatter',
+  },
+  'regex-tester': {
+    pattern: '^[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}$',
+    text: 'user@example.com',
+  },
+  'json-formatter': {
+    json_string: '{"name":"Guppy Kit","version":1,"features":["tools","api","mcp"]}',
+  },
+  'sql-formatter': {
+    sql: 'SELECT u.id, u.email, COUNT(e.id) as executions FROM users u LEFT JOIN executions e ON u.id = e.user_id WHERE u.is_active = true GROUP BY u.id ORDER BY executions DESC LIMIT 10',
+  },
+};
+
+function ArrayLineEditor({
+  value,
+  onChange,
+  itemType = 'string',
+  placeholder,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  itemType?: 'string' | 'number';
+  placeholder?: string;
+}) {
+  let displayValue = '';
+  try {
+    const arr = JSON.parse(value || '[]');
+    displayValue = Array.isArray(arr) ? arr.join('\n') : '';
+  } catch {
+    displayValue = value;
+  }
+
+  function handleChange(text: string) {
+    const lines = text.split('\n').filter(l => l.trim() !== '');
+    let items: (string | number)[];
+    if (itemType === 'number') {
+      items = lines.map(l => parseFloat(l)).filter(n => !isNaN(n));
+    } else {
+      items = lines;
+    }
+    onChange(JSON.stringify(items));
+  }
+
+  return (
+    <div className="space-y-1">
+      <p className="text-[11px] text-muted-foreground">One item per line</p>
+      <CodeEditor
+        value={displayValue}
+        onChange={handleChange}
+        language="plaintext"
+        height="160px"
+        placeholder={placeholder ?? (itemType === 'number' ? '1.5\n3.2\n7.8' : 'Item 1\nItem 2\nItem 3')}
+      />
+    </div>
+  );
 }
 
 interface ToolInputProps {
@@ -114,6 +195,26 @@ export function ToolInput({ toolName, values, onChange }: ToolInputProps) {
 
   return (
     <div className="space-y-4">
+      {TOOL_SAMPLES[toolName] && (
+        <div className="flex justify-end mb-3">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="h-7 text-xs gap-1.5"
+            onClick={() => {
+              const sample = TOOL_SAMPLES[toolName];
+              if (sample) {
+                // Merge sample into current values
+                onChange({ ...values, ...sample });
+              }
+            }}
+          >
+            <FlaskConical className="h-3.5 w-3.5" />
+            Load sample
+          </Button>
+        </div>
+      )}
       {fields.map((field) => {
         const val = values[field.name];
         
@@ -218,8 +319,12 @@ export function ToolInput({ toolName, values, onChange }: ToolInputProps) {
         }
 
         // text fields
+        const isList = field.type === "array" && (
+          field.items?.type === "string" || field.items?.type === "number"
+        );
+        
         const isSql = field.name === "sql" || field.name.endsWith("_sql") || field.name === "query";
-        const isJson = field.type === "object" || field.type === "array" || field.name === "json" || field.name.endsWith("_json") || field.name.startsWith("json_");
+        const isJson = field.type === "object" || (field.type === "array" && !isList) || field.name === "json" || field.name.endsWith("_json") || field.name.startsWith("json_");
         const isMarkdown = field.name.startsWith("markdown") || field.name.endsWith("_markdown");
         const isLongText = field.name.endsWith("_text") || field.name === "text" || field.name === "content" || field.name === "input" || field.name.endsWith("_content");
         const isCsv = field.name.includes("csv") || field.type === "csv";
@@ -229,6 +334,25 @@ export function ToolInput({ toolName, values, onChange }: ToolInputProps) {
           if (typeof v === "object") return JSON.stringify(v, null, 2);
           return String(v);
         };
+        
+        if (isList) {
+          return (
+            <div key={field.name} className="space-y-1.5">
+              {labelNode}
+              <ArrayLineEditor
+                value={typeof val === 'string' ? val : JSON.stringify(val ?? field.default ?? [])}
+                onChange={(str) => {
+                  try {
+                    onChange({ ...values, [field.name]: JSON.parse(str) });
+                  } catch {
+                    onChange({ ...values, [field.name]: str });
+                  }
+                }}
+                itemType={field.items?.type as "string" | "number"}
+              />
+            </div>
+          );
+        }
 
         if (isSql || isJson || isMarkdown || isLongText || isCsv) {
           let placeholder = "";

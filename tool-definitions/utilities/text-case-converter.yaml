@@ -1,0 +1,15 @@
+name: text-case-converter
+version: "1.0.0"
+category: utilities
+description: "Convert text between camelCase, snake_case, kebab-case, PascalCase, and more."
+tags:
+  - text
+  - case
+  - convert
+  - camel
+  - snake
+  - kebab
+  - utilities
+icon: type
+input_artifact_types: []
+output_artifact_type: json

@@ -144,6 +144,7 @@ export function ToolToolbar({
               <Button
                 id={`toolbar-api-${toolName}`}
                 variant="ghost" size="sm"
+                nativeButton={false}
                 className="h-7 w-7 p-0 text-muted-foreground"
                 render={
                   <a
@@ -179,7 +180,7 @@ export function ToolToolbar({
                 )}
               </Button>
             </TooltipTrigger>
-            <TooltipContent>Run Tool (Ctrl+⏎)</TooltipContent>
+            <TooltipContent>Run Tool &middot; Ctrl+Enter</TooltipContent>
           </Tooltip>
         </TooltipProvider>
       </div>

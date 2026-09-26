@@ -34,7 +34,7 @@ export function ToolOutput({ output, isLoading, artifactType }: ToolOutputProps)
 
   return (
     <ArtifactViewer
-      output={output.result ?? output.output ?? output.text ?? output}
+      output={output.result ?? output.output ?? output.text ?? output.svg ?? output.html ?? output}
       artifactType={artifactType}
       isLoading={isLoading}
     />

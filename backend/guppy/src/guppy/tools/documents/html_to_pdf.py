@@ -1,10 +1,13 @@
 """HTML to PDF converter."""
 
 from __future__ import annotations
+
 import base64
 import re
 from io import BytesIO
+
 from pydantic import BaseModel, Field
+
 from guppy.core.types import ArtifactType, ToolCategory
 from guppy.tools.base import BaseTool
 
@@ -35,10 +38,9 @@ class HtmlToPdfTool(BaseTool):
     config_schema = BaseModel
 
     async def execute(self, input: Input, config: BaseModel) -> Output:
-        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
         from reportlab.lib.pagesizes import A4
-        from reportlab.lib import colors
+        from reportlab.lib.styles import getSampleStyleSheet
+        from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
 
         buf = BytesIO()
         doc = SimpleDocTemplate(

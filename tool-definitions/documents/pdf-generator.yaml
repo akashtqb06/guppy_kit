@@ -1,0 +1,11 @@
+name: pdf-generator
+version: "1.0.0"
+category: documents
+description: "Generate a PDF from text."
+tags:
+  - pdf
+  - document
+  - generator
+icon: file-text
+input_artifact_types: []
+output_artifact_type: pdf

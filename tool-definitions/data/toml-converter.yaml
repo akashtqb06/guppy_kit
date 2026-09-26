@@ -1,0 +1,13 @@
+name: toml-converter
+version: "1.0.0"
+category: data
+description: "Convert between TOML and JSON formats."
+tags:
+  - toml
+  - json
+  - convert
+  - config
+  - data
+icon: file-json-2
+input_artifact_types: []
+output_artifact_type: text

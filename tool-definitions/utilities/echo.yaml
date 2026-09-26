@@ -1,0 +1,11 @@
+name: echo
+version: "1.0.0"
+category: utilities
+description: "A simple echo tool for testing."
+tags:
+  - echo
+  - test
+  - utilities
+icon: message-square
+input_artifact_types: []
+output_artifact_type: text

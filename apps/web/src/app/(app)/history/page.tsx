@@ -1,218 +1,192 @@
 "use client";
-
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { Badge, Button, Card, CardContent, Input } from "@guppy-kit/ui";
+import { Search, Clock, CheckCircle2, XCircle, Download, RefreshCw, Filter } from "lucide-react";
 import Link from "next/link";
-import { Badge, Skeleton, Button, Dialog, DialogContent, DialogHeader, DialogTitle, Card, CardContent, Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@guppy-kit/ui";
-import { Clock, Table as TableIcon } from "lucide-react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 interface Execution {
   id: string;
   tool_name: string;
-  tool_version?: string;
-  status: string;
-  duration_ms: number;
+  tool_version: string;
+  status: "completed" | "failed" | "running";
+  duration_ms: number | null;
+  artifact_id: string | null;
   started_at: string;
-  input_snapshot?: any;
-  artifact_id?: string;
+  completed_at: string | null;
+  caller_type: string | null;
 }
 
 export default function HistoryPage() {
   const [executions, setExecutions] = useState<Execution[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "completed" | "failed">("all");
+  const [view, setView] = useState<"list" | "timeline">("list");
 
-  // Modal State
-  const [selectedExec, setSelectedExec] = useState<Execution | null>(null);
-
-  useEffect(() => {
-    async function fetchHistory() {
-      try {
-        const res = await fetch(`${API_BASE}/api/v1/executions?limit=50`, { credentials: "include" });
-        if (!res.ok) throw new Error("Failed to load history");
+  const fetchExecutions = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/executions?limit=100`, { credentials: "include" });
+      if (res.ok) {
         const data = await res.json();
-        setExecutions(Array.isArray(data) ? data : (data.items || []));
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Error loading history");
-      } finally {
-        setIsLoading(false);
+        setExecutions(Array.isArray(data) ? data : (data.items ?? []));
       }
+    } finally {
+      setIsLoading(false);
     }
-    fetchHistory();
   }, []);
 
-  const getStatusBadge = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "completed":
-      case "success":
-        return <Badge className="bg-green-500/10 text-green-500 hover:bg-green-500/20">Completed</Badge>;
-      case "failed":
-      case "error":
-        return <Badge variant="destructive">Failed</Badge>;
-      case "running":
-        return <Badge className="bg-blue-500/10 text-blue-500 hover:bg-blue-500/20">Running</Badge>;
-      default:
-        return <Badge variant="secondary">{status}</Badge>;
-    }
-  };
+  useEffect(() => { fetchExecutions(); }, [fetchExecutions]);
 
-  const [viewMode, setViewMode] = useState<'table' | 'timeline'>('table');
+  const filtered = executions.filter(e => {
+    const matchSearch = !search || e.tool_name.includes(search.toLowerCase());
+    const matchStatus = statusFilter === "all" || e.status === statusFilter;
+    return matchSearch && matchStatus;
+  });
 
-  if (error) {
-    return (
-      <div className="flex h-full flex-col items-center justify-center p-8 text-center">
-        <div className="mb-4 text-4xl text-red-500">⚠️</div>
-        <h2 className="mb-2 text-xl font-semibold">Error</h2>
-        <p className="mb-6 text-sm text-muted-foreground max-w-md">{error}</p>
-        <Button onClick={() => window.location.reload()}>Retry</Button>
-      </div>
-    );
+  function timeAgo(iso: string) {
+    const diff = Date.now() - new Date(iso).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return "just now";
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    return `${Math.floor(hrs / 24)}d ago`;
   }
 
-  if (isLoading) {
-    return (
-      <div className="p-8 max-w-5xl mx-auto">
-        <h1 className="text-2xl font-bold tracking-tight mb-8">History</h1>
-        <div className="space-y-4">
-          <Skeleton className="h-16 w-full rounded-xl" />
-          <Skeleton className="h-16 w-full rounded-xl" />
-          <Skeleton className="h-16 w-full rounded-xl" />
-        </div>
-      </div>
-    );
-  }
-
-  if (executions.length === 0) {
-    return (
-      <div className="flex h-full flex-col items-center justify-center p-8 text-center">
-        <div className="mb-4 text-4xl">📜</div>
-        <h2 className="mb-2 text-xl font-semibold">No executions yet</h2>
-        <p className="mb-6 text-sm text-muted-foreground max-w-md">
-          Run a tool to see your history.
-        </p>
-        <Link href="/dashboard">
-          <Button className="bg-brand text-brand-foreground hover:bg-brand/90">Go to Dashboard</Button>
-        </Link>
-      </div>
-    );
-  }
+  const completedCount = executions.filter(e => e.status === "completed").length;
+  const failedCount = executions.filter(e => e.status === "failed").length;
+  const avgDuration = executions
+    .filter(e => e.duration_ms !== null)
+    .reduce((acc, e, _, arr) => acc + (e.duration_ms! / arr.length), 0);
 
   return (
-    <div className="p-8 max-w-5xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold tracking-tight">History</h1>
-        <div className="flex items-center gap-2">
-          <Button variant={viewMode === 'table' ? 'default' : 'outline'} size="sm" onClick={() => setViewMode('table')}>
-            <TableIcon className="h-4 w-4 mr-1.5" /> Table
-          </Button>
-          <Button variant={viewMode === 'timeline' ? 'default' : 'outline'} size="sm" onClick={() => setViewMode('timeline')}>
-            <Clock className="h-4 w-4 mr-1.5" /> Timeline
+    <div className="flex flex-col h-full overflow-hidden">
+      {/* Header */}
+      <div className="border-b border-border bg-background px-6 py-4">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <h1 className="text-xl font-bold">History</h1>
+            <p className="text-sm text-muted-foreground">
+              {executions.length} executions · {completedCount} completed · {failedCount} failed
+              {avgDuration > 0 && ` · avg ${avgDuration.toFixed(0)}ms`}
+            </p>
+          </div>
+          <Button variant="outline" size="sm" onClick={fetchExecutions} className="gap-1.5">
+            <RefreshCw className="h-3.5 w-3.5" />
+            Refresh
           </Button>
         </div>
-      </div>
 
-      {viewMode === 'table' ? (
-        <Card className="overflow-hidden">
-          <Table>
-            <TableHeader className="bg-muted/50">
-              <TableRow>
-                <TableHead className="w-[300px]">Tool</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Duration</TableHead>
-                <TableHead className="text-right">Date</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {executions.map((exec) => (
-                <TableRow 
-                  key={exec.id} 
-                  className="cursor-pointer"
-                  onClick={() => setSelectedExec(exec)}
-                >
-                  <TableCell className="font-medium capitalize">
-                    {exec.tool_name.replace(/-/g, ' ')}
-                  </TableCell>
-                  <TableCell>{getStatusBadge(exec.status)}</TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {exec.duration_ms ? `${exec.duration_ms.toFixed(0)} ms` : "—"}
-                  </TableCell>
-                  <TableCell className="text-right text-muted-foreground">
-                    {new Date(exec.started_at).toLocaleString()}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Card>
-      ) : (
-        <div className="relative pl-6">
-          <div className="absolute left-2.5 top-0 bottom-0 w-px bg-border" />
-          
-          {executions.map((exec, i) => (
-            <div key={exec.id} className="relative mb-4">
-              <div className={`absolute -left-4 top-4 h-3 w-3 rounded-full border-2 border-background ${
-                exec.status === 'completed' ? 'bg-green-500' : exec.status === 'failed' ? 'bg-red-500' : 'bg-yellow-500'
-              }`} />
-              
-              <Card className="cursor-pointer hover:border-foreground/20 transition-colors" onClick={() => setSelectedExec(exec)}>
-                <CardContent className="py-3 px-4">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-medium text-sm capitalize">{exec.tool_name.replace(/-/g, ' ')}</span>
-                    <div className="flex items-center gap-2">
-                      {getStatusBadge(exec.status)}
-                      <span className="text-xs text-muted-foreground">{exec.duration_ms ? `${Math.round(exec.duration_ms)}ms` : ''}</span>
-                      <span className="text-xs text-muted-foreground">{new Date(exec.started_at).toLocaleString()}</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+        {/* Stats mini cards */}
+        <div className="mt-4 grid grid-cols-3 gap-3">
+          {[
+            { label: "Total", value: executions.length, color: "text-foreground" },
+            { label: "Success", value: completedCount, color: "text-emerald-600" },
+            { label: "Failed", value: failedCount, color: "text-destructive" },
+          ].map(s => (
+            <div key={s.label} className="rounded-lg border border-border bg-muted/30 px-3 py-2 text-center">
+              <div className={`text-2xl font-bold tabular-nums ${s.color}`}>{s.value}</div>
+              <div className="text-xs text-muted-foreground">{s.label}</div>
             </div>
           ))}
         </div>
-      )}
+      </div>
 
-      <Dialog open={!!selectedExec} onOpenChange={(open) => !open && setSelectedExec(null)}>
-        <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-3">
-              <span className="capitalize">{selectedExec?.tool_name.replace(/-/g, ' ')}</span>
-              <Badge variant="outline" className="font-normal text-xs">{selectedExec?.tool_version || "1.0.0"}</Badge>
-              {selectedExec && getStatusBadge(selectedExec.status)}
-            </DialogTitle>
-          </DialogHeader>
-          
-          <div className="flex-1 overflow-y-auto space-y-6 py-4">
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <p className="text-muted-foreground font-medium mb-1">Started</p>
-                <p>{selectedExec ? new Date(selectedExec.started_at).toLocaleString() : "-"}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground font-medium mb-1">Duration</p>
-                <p>{selectedExec?.duration_ms ? `${selectedExec.duration_ms.toFixed(0)} ms` : "-"}</p>
-              </div>
-            </div>
+      {/* Filters */}
+      <div className="flex items-center gap-3 border-b border-border bg-background px-6 py-3">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Filter by tool name..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="pl-9 h-8 text-sm"
+          />
+        </div>
+        <div className="flex items-center gap-1">
+          {(["all", "completed", "failed"] as const).map(s => (
+            <button
+              key={s}
+              onClick={() => setStatusFilter(s)}
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors border ${
+                statusFilter === s
+                  ? "bg-foreground text-background border-foreground"
+                  : "border-border text-muted-foreground hover:border-foreground/30"
+              }`}
+            >
+              {s.charAt(0).toUpperCase() + s.slice(1)}
+            </button>
+          ))}
+        </div>
+      </div>
 
-            <div className="space-y-2">
-              <p className="text-muted-foreground font-medium text-sm">Input Snapshot</p>
-              <pre className="p-4 rounded-lg bg-muted text-xs overflow-x-auto border">
-                {JSON.stringify(selectedExec?.input_snapshot || { message: "No input provided" }, null, 2)}
-              </pre>
-            </div>
-
-            {selectedExec?.artifact_id && (
-              <div className="space-y-2 pt-2 border-t">
-                <p className="text-muted-foreground font-medium text-sm mb-2">Artifact</p>
-                <Button variant="outline">
-                  <span className="mr-2">⬇️</span>
-                  Download Artifact ({selectedExec.artifact_id})
-                </Button>
-              </div>
-            )}
+      {/* List */}
+      <div className="flex-1 overflow-auto">
+        {isLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-muted border-t-foreground" />
           </div>
-        </DialogContent>
-      </Dialog>
+        ) : filtered.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 gap-3">
+            <Clock className="h-10 w-10 text-muted-foreground/40" />
+            <p className="text-sm text-muted-foreground">{search ? "No matching executions" : "No executions yet"}</p>
+            {!search && <Link href="/tools"><Button variant="outline" size="sm">Explore tools</Button></Link>}
+          </div>
+        ) : (
+          <div className="divide-y divide-border">
+            {filtered.map(exec => (
+              <div key={exec.id} className="flex items-center gap-4 px-6 py-3 hover:bg-muted/30 transition-colors">
+                {/* Status icon */}
+                <div className="shrink-0">
+                  {exec.status === "completed" ? (
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                  ) : exec.status === "failed" ? (
+                    <XCircle className="h-4 w-4 text-destructive" />
+                  ) : (
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-brand border-t-transparent" />
+                  )}
+                </div>
+                {/* Tool info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <Link
+                      href={`/tools/${exec.tool_name.split('-')[0]}/${exec.tool_name}`}
+                      className="text-sm font-medium capitalize hover:underline truncate"
+                    >
+                      {exec.tool_name.replace(/-/g, ' ')}
+                    </Link>
+                    <Badge variant="outline" className="text-[10px] shrink-0">
+                      v{exec.tool_version}
+                    </Badge>
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {timeAgo(exec.started_at)}
+                    {exec.duration_ms !== null && ` · ${exec.duration_ms.toFixed(0)}ms`}
+                    {exec.caller_type && ` · via ${exec.caller_type}`}
+                  </div>
+                </div>
+                {/* Actions */}
+                <div className="flex items-center gap-2 shrink-0">
+                  {exec.artifact_id && (
+                    <a
+                      href={`${API_BASE}/api/v1/artifacts/${exec.artifact_id}/download`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                        <Download className="h-3.5 w-3.5" />
+                      </Button>
+                    </a>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

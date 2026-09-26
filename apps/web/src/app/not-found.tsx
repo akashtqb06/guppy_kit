@@ -13,10 +13,10 @@ export default function NotFound() {
           </p>
         </div>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Button render={<Link href="/dashboard" />} className="w-full sm:w-auto bg-brand text-brand-foreground hover:bg-brand/90">
+          <Button nativeButton={false} render={<Link href="/dashboard" />} className="w-full sm:w-auto bg-brand text-brand-foreground hover:bg-brand/90">
             Go to Dashboard
           </Button>
-          <Button variant="outline" render={<Link href="/" />} className="w-full sm:w-auto">
+          <Button nativeButton={false} variant="outline" render={<Link href="/" />} className="w-full sm:w-auto">
             Home
           </Button>
         </div>

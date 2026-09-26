@@ -1,0 +1,14 @@
+name: table-generator
+version: "1.0.0"
+category: data
+description: "Convert a JSON array to a Markdown or HTML table."
+tags:
+  - table
+  - json
+  - markdown
+  - html
+  - convert
+  - data
+icon: table
+input_artifact_types: []
+output_artifact_type: markdown
